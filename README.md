@@ -1,17 +1,20 @@
 # Neo4j Cloud Functions
 
-Useful google cloud functions for working with neo4j. 
+Useful google cloud functions for working with neo4j.  Turn any neo4j
+database into a data sink that can be useful for callback hooks!
 
-## Requirements
+## Pre-Requisites
 
-You must have a GCP project, the `gcloud` CLI installed, and have enabled Google Cloud Functions API in that
-project in order to use this repo.
+- Have a Google Cloud project
+- Have `gcloud` CLI installed
+- Enable the Cloud Functions API on that project.
 
 ## Local Testing
 
 ```
 ./node_modules/.bin/functions start
 ./node_modules/.bin/functions deploy node --trigger-http
+./node_modules/.bin/functions deploy edge --trigger-http
 ```
 
 Inspect local logs with
