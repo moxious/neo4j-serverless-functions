@@ -94,7 +94,13 @@ If deeply nested JSON is posted to the endpoint, the dictionary will be flattene
 }
 ```
 
-Will turn into a property `\`model.name\`: "something"` in neo4j.
+Will turn into a property 
+
+```
+`model.name`: "something"
+```
+
+in neo4j.
 
 By customizing the URL you use for the webhook, you can track source of data.  For example,
 providing to the slack external webhook a URL of: `http://cloud-endpoint/node?label=SlackMessage`.
