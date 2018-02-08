@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const moment = require('moment');
 const neo4j = require('../neo4j');
+const common = require('./common');
 
 const VERSION = 1;
 const RESPOND_WITH_CONTENT = false;
@@ -44,25 +45,28 @@ const edge = (req, res) => {
           (b:\`${req.query.toLabel}\` {
             \`${req.query.toProp}\`: {toVal}
           })
+        CREATE (req:Request {requestProps})
         CREATE (a)-[r:\`${req.query.relType || 'link'}\` {relProps}]->(b)
+        CREATE (req)-[:links]->(a)
         RETURN r;
     `;
 
-    // What do we want to add to the request?
-    const markers = () => {
-        const extraStuff = {};
-        extraStuff.date = moment.utc().format();
-        extraStuff.version = VERSION;
-
-        return extraStuff;
-    };
+    const relMarkers = common.markers();
 
     // Neo4j takes key/value props, not arbitrarily nested javascript objects,
     // so we convert.
     const relProps = neo4j.createNeo4jPropertiesFromObject(
-        _.merge(_.cloneDeep(req.body), markers()));
+        _.merge(_.cloneDeep(req.body), _.cloneDeep(relMarkers)));
 
-    const queryParams = _.merge(_.cloneDeep(req.query), { relProps });
+    // Use regular request props, but override with the same markers
+    // as the relationship has so we can correlate the two.
+    const requestProps = _.merge(common.getRequestProps(req), 
+        _.cloneDeep(relMarkers));
+
+    const queryParams = _.merge(
+        _.cloneDeep(req.query), 
+        { relProps, requestProps }
+    );
     const session = neo4j.getDriver().session();
 
     console.log('Running ', cypher, 'with', queryParams);
