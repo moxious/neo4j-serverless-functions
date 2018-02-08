@@ -48,6 +48,30 @@ gcloud beta functions deploy node --trigger-http
 gcloud beta functions deploy edge --trigger-http
 ```
 
+## Quick Example of functions and their results
+
+```
+# Given this local deploy URL prefix (provided by local testing above)
+LOCALDEPLOY=http://localhost:8010/my-project/my-zone
+
+# Node
+curl -H "Content-Type: application/json" -X POST \
+   -d '{"username":"xyz","name":"David"}' \
+   $LOCALDEPLOY/node?label=User
+
+# Node
+curl -H "Content-Type: application/json" -X POST \
+   -d '{"username":"foo","name":"Mark"}' \
+   $LOCALDEPLOY/node?label=User
+
+# Edge
+curl -H "Content-Type: application/json" -X POST \
+   -d '{"since":"yesterday","metadata":"whatever"}' \
+   $LOCALDEPLOY'/edge?fromLabel=User&fromProp=username&fromVal=xyz&toLabel=User&toProp=username&toVal=foo&relType=knows'
+```
+
+![Example Result Graph](example.png)
+
 ## Node Function
 
 This function takes all data reported into the endpoint, and creates a node with a specified label having those properties.   Example:
