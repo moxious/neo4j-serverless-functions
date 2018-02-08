@@ -3,6 +3,9 @@
 Useful google cloud functions for working with neo4j.  Turn any neo4j
 database into a data sink that can be useful for callback hooks!
 
+Any online service that permits a callback webhook can use this code.  Right now I'm
+using it with Trello and Slack, but others are possible too.
+
 ## Pre-Requisites
 
 - Have a Google Cloud project
@@ -74,17 +77,27 @@ curl -H "Content-Type: application/json" -X POST \
 
 ## Node Function
 
-This function takes all data reported into the endpoint, and creates a node with a specified label having those properties.   Example:
+This function takes JSON body data reported into the endpoint, and creates a node with a specified label having those properties.   Example:
 
 ```
-curl http://whatever-endpoint/node?label=Foo&x=1&y=2
+curl -XPOST -d '{"name":"Bob"}' http://cloud-endpoint/node?label=Person
 ```
 
-Will result in a node with the label Foo, having property names like `query.x=1, query.y=2`.   You can also POST a JSON body to the function,
-and it will store whatever it is sent under body properties.
+Will result in a node with the label Foo, having property names like `name:"Bob"`.
 
-Obviously this schema isn't going to work for most people in most use cases, but it's a very easy starting point.  The node function can easily
-be customized to create data however wished.
+If deeply nested JSON is posted to the endpoint, the dictionary will be flattened, so that:
+```
+{
+    "model": {
+        "name": "something"
+    }
+}
+```
+
+Will turn into a property `\`model.name\`: "something"` in neo4j.
+
+By customizing the URL you use for the webhook, you can track source of data.  For example,
+providing to the slack external webhook a URL of: `http://cloud-endpoint/node?label=SlackMessage`.
 
 ## Edge Function
 
@@ -102,3 +115,10 @@ This is equivalent to doing this in Cypher:
    MATCH (a:Foo { x: "5" }), (b:Foo { x: "6" })
    CREATE (a)-[:blark { x: 1, y: 2 }]->(b);
 ```
+
+Any POST'd JSON data will be stored as properties on the relationship.
+
+## Request Metadata
+
+HTTP headers associated with the requests will be stored in `:Request` nodes, which are linked
+to the nodes created by the functions, for traceability.
