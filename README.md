@@ -46,9 +46,17 @@ but not when deployed.
 
 ## Deploy
 
+HTTP triggered functions
+
 ```
 gcloud beta functions deploy node --trigger-http
 gcloud beta functions deploy edge --trigger-http
+```
+
+Pubsub triggered functions
+
+```
+gcloud functions deploy echo --trigger-resource PUBSUB_TOPIC_ID --trigger-event google.pubsub.topic.publish
 ```
 
 ## Quick Example of functions and their results
