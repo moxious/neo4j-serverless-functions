@@ -6,13 +6,6 @@ const moment = require('moment');
 const VERSION = 1;
 const RESPOND_WITH_CONTENT = false;
 
-// const echo = (req, res) => {
-//     console.log('QUERY',req.query);
-//     console.log('PARAMS',req.params);
-//     console.log('BODY',req.body);
-//     res.status(200).send('OK');
-//   };
-
 const echo = (event, callback) => {
   const pubsubMessage = event.data;
   const msgData = pubsubMessage.data ? Buffer.from(pubsubMessage.data, 'base64').toString() : null;
