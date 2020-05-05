@@ -43,8 +43,6 @@ Place a file called `creds.json` in the neo4j subdirectory, looking like this:
 }
 ```
 
-Believe it or not, [google cloud functions don't yet support env vars](https://issuetracker.google.com/issues/35907643)
-
 This file will not be checked into git, and you should take care to protect it.  If the file is missing, the functions will take local env
 vars `NEO4J_USER`, `NEO4J_PASSWORD`, and `NEO4J_URI`, which will work locally
 but not when deployed.
@@ -52,9 +50,20 @@ but not when deployed.
 ## Deploy
 
 ```
-gcloud beta functions deploy node --trigger-http
-gcloud beta functions deploy edge --trigger-http
+export NEO4J_USER=neo4j
+export NEO4J_PASSWORD=secret
+export NEO4J_URI=neo4j+s://my-host:7687/
+
+gcloud beta functions deploy node \
+     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
+     --trigger-http
+
+gcloud beta functions deploy edge \
+     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI FOO=bar,BAZ=boo \
+     --trigger-http
 ```
+
+[See related documentation](https://cloud.google.com/functions/docs/env-var)
 
 ## Quick Example of functions and their results
 
