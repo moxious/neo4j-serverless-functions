@@ -1,10 +1,8 @@
 const _ = require('lodash');
 const moment = require('moment');
 const neo4j = require('../neo4j');
+const Integer = require('neo4j-driver/lib/integer.js');
 const common = require('./common');
-
-const VERSION = 1;
-const RESPOND_WITH_CONTENT = false;
 
 const node = (req, res) => {
     console.log('TEST');
@@ -15,29 +13,39 @@ const node = (req, res) => {
     // so we convert.
     const requestProps = common.getRequestProps(req);
 
-    const props = neo4j.createNeo4jPropertiesFromObject(
-        _.merge(common.markers(), 
-            _.isEmpty(req.body) ? req.params : req.body));
+    let records;
 
+    if (_.isEmpty(req.body)) {
+        records = [req.params];
+    } else if (_.isArray(req.body)) {
+        records = req.body;
+    } else if (_.isObject(req.body)) {
+        records = [req.body];
+    }
+
+    // Batch parameter to set in query.
+    const batch = records.map(propSet => ({ props: neo4j.createNeo4jPropertiesFromObject(propSet) }));
     const session = neo4j.getDriver().session();
 
     const cypher = `
-        CREATE (r:Request {requestProps})-[:\`${req.method}\`]->
-               (p:\`${label}\` {props}) 
-        RETURN p
+        UNWIND $batch as input
+        CREATE (p:\`${label}\`) 
+        SET p += input.props
+        RETURN id(p) as id
     `;
     
     const queryParams = {
-        requestProps, props, label, method: req.method,
+        batch,
+        requestProps, 
+        method: req.method,
     };
 
     return session.writeTransaction(tx => tx.run(cypher, queryParams))
         .then(result => {
-            if (RESPOND_WITH_CONTENT) {
-                return res.status(200).json(result.records[0].get('p'));
-            }
-
-            return res.status(200).json('OK');
+            const data = result.records
+                .map(rec => rec.get('id'))
+                .map(num => Integer.inSafeRange(num) ? Integer.toNumber(num) : Integer.toString(num));
+            return res.status(200).json(data);
         })
         .catch(err => {
             return res.status(500).json({
@@ -45,7 +53,8 @@ const node = (req, res) => {
                 error: `${err}`,
                 stack: err.stack,
             });
-        });
+        })
+        .finally(session.close);
 };
 
 module.exports = node;
