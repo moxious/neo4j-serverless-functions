@@ -1,4 +1,4 @@
-const neo4j = require('neo4j-driver').v1;
+const neo4j = require('neo4j-driver');
 const Promise = require('bluebird');
 const flat = require('flat');
 const _ = require('lodash');
@@ -20,7 +20,7 @@ exports.creds = () => [
  */
 const driverSetup = () => {
     const username = process.env.NEO4J_USER || _creds.username || 'neo4j';
-    const password = process.env.NEO4J_PASS || _creds.password || 'neo4j';
+    const password = process.env.NEO4J_PASSWORD || _creds.password || 'neo4j';
     const uri = process.env.NEO4J_URI || _creds.uri || 'bolt://localhost';
 
     const auth = neo4j.auth.basic(username, password);

@@ -12,12 +12,17 @@ using it with Trello and Slack, but others are possible too.
 - Have `gcloud` CLI installed
 - Enable the Cloud Functions API on that project.
 
+## Setup
+
+```
+yarn install
+```
+
 ## Local Testing
 
 ```
-./node_modules/.bin/functions start
-./node_modules/.bin/functions deploy node --trigger-http
-./node_modules/.bin/functions deploy edge --trigger-http
+./node_modules/.bin/functions-framework --target=node
+./node_modules/.bin/functions-framework --target=edge
 ```
 
 Inspect local logs with
@@ -41,7 +46,7 @@ Place a file called `creds.json` in the neo4j subdirectory, looking like this:
 Believe it or not, [google cloud functions don't yet support env vars](https://issuetracker.google.com/issues/35907643)
 
 This file will not be checked into git, and you should take care to protect it.  If the file is missing, the functions will take local env
-vars `NEO4J_USER`, `NEO4J_PASS`, and `NEO4J_URI`, which will work locally
+vars `NEO4J_USER`, `NEO4J_PASSWORD`, and `NEO4J_URI`, which will work locally
 but not when deployed.
 
 ## Deploy

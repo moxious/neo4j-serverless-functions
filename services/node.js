@@ -7,6 +7,7 @@ const VERSION = 1;
 const RESPOND_WITH_CONTENT = false;
 
 const node = (req, res) => {
+    console.log('TEST');
     // If user submitted a label, use that.
     const label = _.get(req.query, 'label') || _.get(req.params, 'label') || 'Entry';
 
