@@ -2,6 +2,7 @@ const neo4j = require('neo4j-driver');
 const Promise = require('bluebird');
 const flat = require('flat');
 const _ = require('lodash');
+const me = require('../package.json');
 
 /**
  * Using environment variables, creates a new authenticated driver instance.
@@ -12,7 +13,10 @@ const driverSetup = () => {
     const uri = process.env.NEO4J_URI || 'bolt://localhost';
 
     const auth = neo4j.auth.basic(username, password);
-    return neo4j.driver(uri, auth);
+    const driver = neo4j.driver(uri, auth);
+
+    driver._userAgent = `neo4j-serverless-functions/v${me.version}`;
+    return driver;
 };
 
 let persistentDriver = null;
