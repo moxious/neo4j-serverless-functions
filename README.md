@@ -34,27 +34,12 @@ yarn test
 ./node_modules/.bin/functions-framework --target=edge
 ```
 
-Inspect local logs with
-
-```
-./node_modules/.bin/functions logs read
-```
-
 ## Configure
 
-Place a file called `creds.json` in the neo4j subdirectory, looking like this:
-
-```
-{
-    "username": "neo4j",
-    "password": "neo4j",
-    "uri": "bolt://localhost"
-}
-```
-
-This file will not be checked into git, and you should take care to protect it.  If the file is missing, the functions will take local env
-vars `NEO4J_USER`, `NEO4J_PASSWORD`, and `NEO4J_URI`, which will work locally
-but not when deployed.
+Connection details to your Neo4j instance are taken out of three env vars:
+- `NEO4J_USER`
+- `NEO4J_PASSWORD`
+- `NEO4J_URI`
 
 ## Deploy
 
