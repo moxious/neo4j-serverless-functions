@@ -137,10 +137,20 @@ This is equivalent to doing this in Cypher:
 
 Any POST'd JSON data will be stored as properties on the relationship.
 
-## CUD Format
+## CUD Function
 
-The CUD format is a tiny JSON format that allows you to specify a graph "Create, Update, or Delete" (CUD)
-operation on a graph.  For example, a JSON message may indicate that you want to create a node with certain
-labels and properties.
+The CUD function takes an array of CUD command objects.
+
+The CUD format is a tiny JSON format that allows you to specify a graph "Create, Update, 
+or Delete" (CUD) operation on a graph.  For example, a JSON message may indicate that you 
+want to create a node with certain labels and properties.
 
 [See here for documentation on the CUD format](https://neo4j.com/docs/labs/neo4j-streams/current/#_cud_file_format)
+
+Example:
+
+```
+curl --data @test/cud-messages.json \
+    -H "Content-Type: application/json" -X POST \
+    $LOCALDEPLOY
+```
