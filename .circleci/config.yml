@@ -55,7 +55,3 @@ jobs:
             path: /tmp/artifacts
       - store_artifacts:
             path: /home/circleci/.npm
-      - store_artifacts:
-            path: dist/
-      - store_artifacts:
-            path: src/build.json
