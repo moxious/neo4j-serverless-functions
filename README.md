@@ -20,20 +20,6 @@ using it with Trello and Slack, but others are possible too.
 yarn install
 ```
 
-## Unit Testing
-
-```
-yarn test
-```
-
-## Local Testing
-
-```
-./node_modules/.bin/functions-framework --target=cud
-./node_modules/.bin/functions-framework --target=node
-./node_modules/.bin/functions-framework --target=edge
-```
-
 ## Configure
 
 Connection details to your Neo4j instance are taken out of three env vars:
@@ -48,17 +34,18 @@ that unauthenticated users can connect to.  Tailor the settings to your needs.
 
 ### PubSub Triggered Functions
 
+Make sure to customize the trigger topic and environment variables!
+
 ```
 export NEO4J_USER=neo4j
 export NEO4J_PASSWORD=secret
 export NEO4J_URI=neo4j+s://my-host:7687/
-export TOPIC=messages
 
 gcloud functions deploy cudPubsub \
      --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
-     --trigger-topic $TOPIC
+     --trigger-topic neo4j-cud
 
 gcloud functions deploy cypherPubsub \
      --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
@@ -189,4 +176,37 @@ Example:
 curl --data @test/cud-messages.json \
     -H "Content-Type: application/json" -X POST \
     $LOCALDEPLOY
+```
+
+## Cypher Function
+
+It takes two simple arguments:  a cypher string, and an array of batch inputs.  An example
+input would look like this:
+
+```
+{
+    "cypher": "CREATE (p:Person) SET p += event",
+    "batch": [
+        { "name": "Sarah", "age": 22 },
+        { "name": "Bob", "age": 25 }
+    ]
+}
+```
+
+Your query will always be prepended with the clause `UNWIND batch AS event` so that
+the "event" variable reference will always be defined in your query to reference an individual
+row of data.
+
+## Unit Testing
+
+```
+yarn test
+```
+
+## Local Testing
+
+```
+./node_modules/.bin/functions-framework --target=cud
+./node_modules/.bin/functions-framework --target=node
+./node_modules/.bin/functions-framework --target=edge
 ```
