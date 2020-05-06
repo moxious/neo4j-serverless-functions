@@ -8,10 +8,10 @@ const cud = (req, res) => {
     const records = req.body;
 
     if (_.isNil(records) || !_.isArray(records) || _.isEmpty(records)) {
-        return res.status(400).json({
+        return Promise.resolve(res.status(400).json({
             date: moment.utc().format(),
             error: `Required: a non-empty JSON array of CUD messages`,
-        });
+        }));
     }
 
     let commands;
@@ -20,10 +20,10 @@ const cud = (req, res) => {
         commands = records.map(rec => new CUDCommand(rec));
     } catch(e) {
         // This is going to be a CUD message formatting error
-        return res.status(400).json({
+        return Promise.resolve(res.status(400).json({
             date: moment.utc().format(),
             error: `${err}`,
-        });
+        }));
     }
 
     const session = neo4j.getDriver().session();
@@ -33,8 +33,12 @@ const cud = (req, res) => {
     return session.writeTransaction(tx =>
         Promise.mapSeries(commands, cudCommand => cudCommand.run(tx))
     )
-        .then(results => res.status(200).json(results))
+        .then(results => {
+            console.log('CUD GOOD', results);
+            return res.status(200).json(results);
+        })
         .catch(err => {
+            console.error('CUD bail error', err);
             return res.status(500).json({
                 date: moment.utc().format(),
                 error: `${err}`,

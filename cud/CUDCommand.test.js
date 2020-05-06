@@ -2,7 +2,7 @@ const CUDCommand = require('./CUDCommand');
 
 const cleanupString = str => str.trim().replace(/\s+/g, ' ');
 
-describe('CUD Command', function() {
+describe('CUD Command', function () {
     it('should create a node', () => {
         const data = {
             op: 'create',
@@ -75,7 +75,7 @@ describe('CUD Command', function() {
             op: 'create',
             type: 'relationship',
             from: {
-                ids: { x: 1,  y: 2 },
+                ids: { x: 1, y: 2 },
                 labels: ['Person'],
             },
             to: {
@@ -108,5 +108,56 @@ describe('CUD Command', function() {
         const expected = "MATCH (a:`Foo` { `uuid`: $event.from.ids.`uuid` })-[r:`blorko`]->(b:`Bar` { `uuid`: $event.to.ids.`uuid` }) DELETE r RETURN $event.op as op, $event.type as type, id(r) as id";
         const c = new CUDCommand(data);
         expect(cleanupString(c.generate())).toEqual(expected);
+    });
+
+    describe('Validation', () => {
+        it('should fail a bogus message', () =>
+            expect(() => new CUDCommand()).toThrow(Error));
+
+        it('requires IDs for node merge', () =>
+            expect(() => new CUDCommand({
+                type: 'node',
+                op: 'merge',
+                labels: ['Foo'],
+                properties: { x: 1 },
+            })).toThrow(Error));
+
+        it('requires labesl for node merge', () =>
+            expect(() => new CUDCommand({
+                type: 'node',
+                op: 'merge',
+                ids: { x: 1 },
+                properties: { x: 1 },
+            })).toThrow(Error));
+
+        it('requires from on relationships', () =>
+            expect(() => new CUDCommand({
+                type: 'relationship',
+                op: 'merge',
+                ids: { x: 1 },
+                rel_type: 'foo',
+                to: { labels: ['X'], ids: { x: 1 } },
+                properties: { x: 1 },
+            })).toThrow(Error));
+
+        it('requires to on relationships', () =>
+            expect(() => new CUDCommand({
+                type: 'relationship',
+                op: 'merge',
+                ids: { x: 1 },
+                rel_type: 'foo',
+                from: { labels: ['X'], ids: { x: 1 } },
+                properties: { x: 1 },
+            })).toThrow(Error));
+
+        it('requires rel_type on relationships', () =>
+            expect(() => new CUDCommand({
+                type: 'relationship',
+                op: 'merge',
+                ids: { x: 1 },
+                from: { labels: ['X'], ids: { x: 1 } },
+                to: { labels: ['X'], ids: { x: 1 } },
+                properties: { x: 1 },
+            })).toThrow(Error));
     });
 });

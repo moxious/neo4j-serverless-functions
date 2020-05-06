@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "jest"
+    "test": "jest --coverage --watchAll=false"
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^1.5.1",

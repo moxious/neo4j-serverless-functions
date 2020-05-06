@@ -46,17 +46,6 @@ const createNeo4jPropertiesFromObject = obj => {
     return flattened;
 };
 
-const buildRelQuery = obj => {
-    const n = new Neode('localhost', 'neo4j', 'admin');
-    return n.query()
-        .match('a', obj.from.label).where(`a.${obj.from.key}`, obj.from.value)
-        .match('b', obj.to.label).where(`b.${obj.to.key}`, obj.to.value)
-        .with(['a', 'b'])
-        .create()
-        
-
-};
-
 module.exports = {
     getDriver,
     createNeo4jPropertiesFromObject,

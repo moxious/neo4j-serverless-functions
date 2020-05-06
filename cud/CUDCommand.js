@@ -154,7 +154,7 @@ class CUDCommand {
                 }
 
                 const id = rec.get('id');
-
+                console.log('PAYLOAD',rec);
                 return {
                     op: rec.get('op'),
                     type: rec.get('type'),
