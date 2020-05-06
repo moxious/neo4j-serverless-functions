@@ -1,5 +1,7 @@
 # Neo4j Cloud Functions
 
+[![CircleCI](https://circleci.com/gh/moxious/neo4j-serverless-functions.svg?style=svg)](https://circleci.com/gh/moxious/neo4j-serverless-functions)
+
 Useful google cloud functions for working with neo4j.  Turn any neo4j
 database into a data sink that can be useful for callback hooks!
 
