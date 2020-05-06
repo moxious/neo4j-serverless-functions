@@ -40,14 +40,12 @@ const edge = (req, res) => {
     const cypher = `
         MATCH 
           (a:\`${req.query.fromLabel}\` {
-            \`${req.query.fromProp}\`: {fromVal}
+            \`${req.query.fromProp}\`: $fromVal
            }), 
           (b:\`${req.query.toLabel}\` {
-            \`${req.query.toProp}\`: {toVal}
+            \`${req.query.toProp}\`: $toVal
           })
-        CREATE (req:Request {requestProps})
-        CREATE (a)-[r:\`${req.query.relType || 'link'}\` {relProps}]->(b)
-        CREATE (req)-[:links]->(a)
+        CREATE (a)-[r:\`${req.query.relType || 'link'}\` $relProps]->(b)
         RETURN r;
     `;
 

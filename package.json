@@ -3,13 +3,21 @@
   "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
   "dependencies": {
-    "@google-cloud/functions-emulator": "^1.0.0-alpha.29",
-    "bluebird": "^3.5.3",
-    "flat": "^4.0.0",
-    "lodash": "^4.17.5",
-    "moment": "^2.20.1",
-    "neo4j-driver": "^1.5.3",
-    "uuid": "^3.2.1"
+    "@google-cloud/functions-framework": "^1.5.1",
+    "bluebird": "^3.7.2",
+    "flat": "^5.0.0",
+    "lodash": "^4.17.15",
+    "moment": "^2.25.3",
+    "neo4j-driver": "^4.0.2",
+    "neode": "^0.4.3",
+    "uuid": "^8.0.0"
+  },
+  "devDependencies": {
+    "jest": "^26.0.1",
+    "sinon": "^9.0.2"
   }
 }

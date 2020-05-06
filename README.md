@@ -1,5 +1,7 @@
 # Neo4j Cloud Functions
 
+[![CircleCI](https://circleci.com/gh/moxious/neo4j-serverless-functions.svg?style=svg)](https://circleci.com/gh/moxious/neo4j-serverless-functions)
+
 Useful google cloud functions for working with neo4j.  Turn any neo4j
 database into a data sink that can be useful for callback hooks!
 
@@ -12,12 +14,24 @@ using it with Trello and Slack, but others are possible too.
 - Have `gcloud` CLI installed
 - Enable the Cloud Functions API on that project.
 
+## Setup
+
+```
+yarn install
+```
+
+## Unit Testing
+
+```
+yarn test
+```
+
 ## Local Testing
 
 ```
-./node_modules/.bin/functions start
-./node_modules/.bin/functions deploy node --trigger-http
-./node_modules/.bin/functions deploy edge --trigger-http
+./node_modules/.bin/functions-framework --target=cud
+./node_modules/.bin/functions-framework --target=node
+./node_modules/.bin/functions-framework --target=edge
 ```
 
 Inspect local logs with
@@ -38,24 +52,38 @@ Place a file called `creds.json` in the neo4j subdirectory, looking like this:
 }
 ```
 
-Believe it or not, [google cloud functions don't yet support env vars](https://issuetracker.google.com/issues/35907643)
-
 This file will not be checked into git, and you should take care to protect it.  If the file is missing, the functions will take local env
-vars `NEO4J_USER`, `NEO4J_PASS`, and `NEO4J_URI`, which will work locally
+vars `NEO4J_USER`, `NEO4J_PASSWORD`, and `NEO4J_URI`, which will work locally
 but not when deployed.
 
 ## Deploy
 
 ```
-gcloud beta functions deploy node --trigger-http
-gcloud beta functions deploy edge --trigger-http
+export NEO4J_USER=neo4j
+export NEO4J_PASSWORD=secret
+export NEO4J_URI=neo4j+s://my-host:7687/
+
+gcloud beta functions deploy node \
+     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
+     --trigger-http
+
+gcloud beta functions deploy edge \
+     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI FOO=bar,BAZ=boo \
+     --trigger-http
 ```
+
+[See related documentation](https://cloud.google.com/functions/docs/env-var)
 
 ## Quick Example of functions and their results
 
 ```
 # Given this local deploy URL prefix (provided by local testing above)
-LOCALDEPLOY=http://localhost:8010/my-project/my-zone
+LOCALDEPLOY=http://localhost:8080/
+
+# CUD
+curl --data @test/cud-messages.json \
+    -H "Content-Type: application/json" -X POST \
+    $LOCALDEPLOY
 
 # Node
 curl -H "Content-Type: application/json" -X POST \
@@ -124,7 +152,10 @@ This is equivalent to doing this in Cypher:
 
 Any POST'd JSON data will be stored as properties on the relationship.
 
-## Request Metadata
+## CUD Format
 
-HTTP headers associated with the requests will be stored in `:Request` nodes, which are linked
-to the nodes created by the functions, for traceability.
+The CUD format is a tiny JSON format that allows you to specify a graph "Create, Update, or Delete" (CUD)
+operation on a graph.  For example, a JSON message may indicate that you want to create a node with certain
+labels and properties.
+
+[See here for documentation on the CUD format](https://neo4j.com/docs/labs/neo4j-streams/current/#_cud_file_format)

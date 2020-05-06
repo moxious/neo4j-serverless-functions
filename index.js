@@ -1,5 +1,6 @@
 const nodeSvc = require('./services/node');
 const edgeSvc = require('./services/edge');
+const cudSvc = require('./services/cud');
 const moment = require('moment');
 
 /**
@@ -26,4 +27,5 @@ const guaranteeResponse = (aFunction, failMsg = 'Error processing response') => 
 module.exports = {
   node: guaranteeResponse(nodeSvc),
   edge: guaranteeResponse(edgeSvc),
+  cud: guaranteeResponse(cudSvc),
 };
