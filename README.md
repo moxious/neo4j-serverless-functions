@@ -43,23 +43,29 @@ Connection details to your Neo4j instance are taken out of three env vars:
 
 ## Deploy
 
+*Make sure to tweak the settings in this deploy*.  This deploys unsecured functions
+that unauthenticated users can connect to.  Tailor the settings to your needs.
+
 ```
 export NEO4J_USER=neo4j
 export NEO4J_PASSWORD=secret
 export NEO4J_URI=neo4j+s://my-host:7687/
 
 gcloud functions deploy cud \
-     --ingress-settings=all --runtime=node10 \
+     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 
 gcloud functions deploy node \
-     --ingress-settings=all --runtime=node10  \
+     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 
 gcloud functions deploy edge \
-     --ingress-settings=all --runtime=node10 \
+     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 ```

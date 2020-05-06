@@ -22,7 +22,7 @@ const cud = (req, res) => {
         // This is going to be a CUD message formatting error
         return Promise.resolve(res.status(400).json({
             date: moment.utc().format(),
-            error: `${err}`,
+            error: `${e}`,
         }));
     }
 
@@ -34,11 +34,9 @@ const cud = (req, res) => {
         Promise.mapSeries(commands, cudCommand => cudCommand.run(tx))
     )
         .then(results => {
-            console.log('CUD GOOD', results);
             return res.status(200).json(results);
         })
         .catch(err => {
-            console.error('CUD bail error', err);
             return res.status(500).json({
                 date: moment.utc().format(),
                 error: `${err}`,
