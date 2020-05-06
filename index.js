@@ -2,6 +2,7 @@ const nodeSvc = require('./services/http/node');
 const edgeSvc = require('./services/http/edge');
 const cudSvc = require('./services/http/cud');
 const cudPubsub = require('./services/pubsub/cudPubsub');
+const cypherPubsub = require('./services/pubsub/cypherPubsub');
 const moment = require('moment');
 
 /**
@@ -40,4 +41,5 @@ module.exports = {
   edge: guaranteeResponseHTTP(edgeSvc),
   cud: guaranteeResponseHTTP(cudSvc),
   cudPubsub: guaranteeCallbackPubsub(cudPubsub),
+  cypherPubsub: guaranteeCallbackPubsub(cypherPubsub),
 };

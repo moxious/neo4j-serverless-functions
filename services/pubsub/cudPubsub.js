@@ -8,7 +8,7 @@ const cud = (pubSubEvent, context, callback) => {
     const records = JSON.parse(Buffer.from(pubSubEvent.data, 'base64').toString());
 
     if (_.isNil(records) || !_.isArray(records) || _.isEmpty(records)) {
-        return callback(new Error('Required: non-empty JSON array of CUD messages'));
+        return Promise.resolve(callback(new Error('Required: non-empty JSON array of CUD messages')));
     }
 
     let commands;
@@ -17,10 +17,10 @@ const cud = (pubSubEvent, context, callback) => {
         commands = records.map(rec => new CUDCommand(rec));
     } catch(e) {
         // This is going to be a CUD message formatting error
-        return callback(e, JSON.stringify({
+        return Promise.resolve(callback(e, JSON.stringify({
             date: moment.utc().format(),
             error: `${e}`,
-        }));
+        })));
     }
 
     return CUDBatch.runAll(commands)

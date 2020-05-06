@@ -59,6 +59,12 @@ gcloud functions deploy cudPubsub \
      --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-topic $TOPIC
+
+gcloud functions deploy cypherPubsub \
+     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --timeout=300 \
+     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
+     --trigger-topic cypher
 ```
 
 ### HTTP Functions
