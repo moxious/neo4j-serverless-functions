@@ -1,5 +1,6 @@
-const cud = require('./cud');
-const cudPubsub = require('../pubsub/cudPubsub');
+const handlers = require('../../index');
+const cud = handlers.cud;
+const cudPubsub = handlers.cudPubsub;
 
 const test = require('../../test');
 const cudMessages = require('../../test/cud-messages.json');
@@ -52,6 +53,15 @@ describe('CUD Function', () => {
                 });
         });
 
+        it('requires well formed JSON', () => {
+            const event = { data: 'alskdjf;alksdjf;asdjkfa;dsfj' };
+
+            return cudPubsub(event, context, callback)
+                .then(() => {
+                    expect(callback.calledOnce).toBe(true);
+                    expect(callback.firstCall.args[0]).toBeInstanceOf(Error);
+                });
+        });
 
         it('should process one simple message', () => {
             const event = { data: encode([cudMessages[0]]) };

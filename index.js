@@ -17,11 +17,11 @@ const guaranteeResponseHTTP = (aFunction, failMsg = 'Error processing response')
       return aFunction(req, res);
     } catch (err) {
       console.error(err);
-      return res.status(500).json({
+      return Promise.resolve(res.status(500).json({
         date: moment.utc().format(),
         message: failMsg,
         error: `${err}`,
-      });
+      }));
     }
   };
 };
@@ -31,7 +31,7 @@ const guaranteeCallbackPubsub = (aFunction) => {
     try {
       return aFunction(pubSubEvent, context, callback);
     } catch(err) { 
-      callback(err);
+      return Promise.resolve(callback(err));
     }
   };
 };
