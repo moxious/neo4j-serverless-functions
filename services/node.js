@@ -5,7 +5,6 @@ const Integer = require('neo4j-driver/lib/integer.js');
 const common = require('./common');
 
 const node = (req, res) => {
-    console.log('TEST');
     // If user submitted a label, use that.
     const label = _.get(req.query, 'label') || _.get(req.params, 'label') || 'Entry';
 

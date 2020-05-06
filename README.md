@@ -48,12 +48,19 @@ export NEO4J_USER=neo4j
 export NEO4J_PASSWORD=secret
 export NEO4J_URI=neo4j+s://my-host:7687/
 
-gcloud beta functions deploy node \
+gcloud functions deploy cud \
+     --ingress-settings=all --runtime=node10 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 
-gcloud beta functions deploy edge \
-     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI FOO=bar,BAZ=boo \
+gcloud functions deploy node \
+     --ingress-settings=all --runtime=node10  \
+     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
+     --trigger-http
+
+gcloud functions deploy edge \
+     --ingress-settings=all --runtime=node10 \
+     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 ```
 

@@ -143,7 +143,7 @@ class CUDCommand {
         const cypher = this.generate();
         const params = { event: this.data };
 
-        console.log('RUNNING ', cypher);
+        // console.log('RUNNING ', cypher);
         return tx.run(cypher, params)
             .then(results => {
                 const rec = results.records[0];
@@ -154,7 +154,7 @@ class CUDCommand {
                 }
 
                 const id = rec.get('id');
-                console.log('PAYLOAD',rec);
+                // console.log('PAYLOAD',rec);
                 return {
                     op: rec.get('op'),
                     type: rec.get('type'),
