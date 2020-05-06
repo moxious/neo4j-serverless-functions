@@ -37,7 +37,7 @@ const labels2Cypher = labels => labels.map(escape).join(':');
 
 const matchProperties = (criteria, paramField='ids') => {
     const clauses = Object.keys(criteria).map(propertyName =>
-        `${escape(propertyName)}: $event.${paramField}.${escape(propertyName)}`)
+        `${escape(propertyName)}: event.${paramField}.${escape(propertyName)}`)
         .join(', ');
         
     return '{ ' + clauses + ' }';
@@ -47,7 +47,7 @@ const matchOn = (alias, criteria, paramField='ids') => {
     const a = escape(alias);
     
     return Object.keys(criteria).map(propertyName =>
-        `${a}.${escape(propertyName)} = $event.${paramField}.${escape(propertyName)}`)
+        `${a}.${escape(propertyName)} = event.${paramField}.${escape(propertyName)}`)
         .join(' AND ');
 };
 
@@ -71,7 +71,7 @@ class CUDCommand {
         return (`
             MATCH ${nodePattern('n', this.data)}
             ${ detach ? 'DETACH' : ''} DELETE n
-            RETURN $event.op as op, $event.type as type, id(n) as id
+            RETURN event.op as op, event.type as type, id(n) as id
         `);
     }
 
@@ -86,8 +86,8 @@ class CUDCommand {
 
         return (`
             ${op.toUpperCase()} ${nodePattern('n', this.data)}
-            SET n += $event.properties
-            RETURN $event.op as op, $event.type as type, id(n) as id
+            SET n += event.properties
+            RETURN event.op as op, event.type as type, id(n) as id
         `);
     }
 
@@ -104,7 +104,7 @@ class CUDCommand {
             MATCH ${nodePattern('a', from, 'from.ids')}-[r:${escape(rel_type)}]->${nodePattern('b', to, 'to.ids')}
             ${extraMatch}
             DELETE r
-            RETURN $event.op as op, $event.type as type, id(r) as id
+            RETURN event.op as op, event.type as type, id(r) as id
         `);
     }
 
@@ -112,11 +112,11 @@ class CUDCommand {
         const { op, from, rel_type, to, properties, ids, labels } = this.data;
         return (`
             MATCH ${nodePattern('a', from, 'from.ids')} 
-            WITH a 
+            WITH a, event
             MATCH ${nodePattern('b', to, 'to.ids')}
             ${op.toUpperCase()} (a)-[r:${escape(rel_type)}]->(b)
-            SET r += $event.properties
-            RETURN $event.op as op, $event.type as type, id(r) as id
+            SET r += event.properties
+            RETURN event.op as op, event.type as type, id(r) as id
         `);
     }
 
@@ -135,15 +135,45 @@ class CUDCommand {
     }
 
     /**
+     * The key for a command ties to what kind of batch the command can be
+     * executed with.  In order to do the UNWIND strategy and batch things
+     * together, the query form must be the same.  We can't for example batch
+     * a relationship create together with a node delete.  This function gives
+     * a "partition key" of what kind of command this is.  Differing commands
+     * with the same keys can be batched together
+     */
+    key() {
+        let { op, type, ids, rel_type, labels, from, to } = this.data;
+
+        const keyparts = [op, type];
+
+        if (type === 'node') {
+            keyparts.push((labels || []).join(','));
+            keyparts.push(Object.keys(ids || {}).join(','));
+        } else {
+            keyparts.push(rel_type);
+            keyparts.push('from=' + from.labels.join(','));
+            keyparts.push('ids=', Object.keys(from.ids).join(','));
+            keyparts.push('to=' + to.labels.join(','));
+            keyparts.push('ids=', Object.keys(to.ids).join(','));
+        }
+
+        // console.log('key',keyparts.join('.'));
+        return keyparts.join('.');
+    }
+
+    /**
      * Run the command
      * @param {Transaction} tx a driver Transaction object
      * @returns {Promise} containing op, type, and id fields on success.
      */
     run(tx) {
-        const cypher = this.generate();
-        const params = { event: this.data };
+        // Bind the $event parameter to the event var reference, which the
+        // query form expects.
+        const cypher = 'WITH $input as event ' + this.generate();
+        const params = { input: this.data };
 
-        // console.log('RUNNING ', cypher);
+        console.log('RUNNING ', cypher, params);
         return tx.run(cypher, params)
             .then(results => {
                 const rec = results.records[0];
