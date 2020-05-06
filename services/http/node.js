@@ -1,8 +1,8 @@
 const _ = require('lodash');
 const moment = require('moment');
-const neo4j = require('../neo4j');
+const neo4j = require('../../neo4j');
 const Integer = require('neo4j-driver/lib/integer.js');
-const common = require('./common');
+const common = require('../common');
 
 const node = (req, res) => {
     // If user submitted a label, use that.

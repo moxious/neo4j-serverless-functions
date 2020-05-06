@@ -1,6 +1,6 @@
-const nodeSvc = require('./services/node');
-const edgeSvc = require('./services/edge');
-const cudSvc = require('./services/cud');
+const nodeSvc = require('./services/http/node');
+const edgeSvc = require('./services/http/edge');
+const cudSvc = require('./services/http/cud');
 const moment = require('moment');
 
 /**

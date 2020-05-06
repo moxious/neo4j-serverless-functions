@@ -1,8 +1,8 @@
 const _ = require('lodash');
 const moment = require('moment');
-const neo4j = require('../neo4j');
+const neo4j = require('../../neo4j');
 const Promise = require('bluebird');
-const CUDCommand = require('../cud/CUDCommand');
+const CUDCommand = require('../../cud/CUDCommand');
 
 const cud = (req, res) => {
     const records = req.body;

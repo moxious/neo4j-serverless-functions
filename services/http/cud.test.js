@@ -1,7 +1,7 @@
 const cud = require('./cud');
-const test = require('../test/');
-const cudMessages = require('../test/cud-messages.json');
-const neo4j = require('../neo4j/');
+const test = require('../../test');
+const cudMessages = require('../../test/cud-messages.json');
+const neo4j = require('../../neo4j');
 const sinon = require("sinon");
 
 describe('CUD Function', () => {

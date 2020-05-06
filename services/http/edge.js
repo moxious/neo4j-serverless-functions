@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const moment = require('moment');
-const neo4j = require('../neo4j');
-const common = require('./common');
+const neo4j = require('../../neo4j');
+const common = require('../common');
 
 const VERSION = 1;
 const RESPOND_WITH_CONTENT = false;

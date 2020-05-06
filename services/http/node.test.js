@@ -1,6 +1,6 @@
 const node = require('./node');
-const test = require('../test/');
-const neo4j = require('../neo4j/');
+const test = require('../../test');
+const neo4j = require('../../neo4j');
 const sinon = require("sinon");
 
 describe('Node Function', () => {
