@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const neo4j = require('../../neo4j/');
 const CypherSink = require('../../cud/CypherSink');
 
 // https://cloud.google.com/functions/docs/writing/background#function_parameters

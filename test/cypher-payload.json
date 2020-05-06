@@ -1,0 +1,8 @@
+{
+    "cypher": "CREATE (i:Item) SET i += event",
+    "batch": [
+        { "id": 1, "name": "Tube socks", "color": "black" },
+        { "id": 2, "name": "10gal aquarium", "color": "clear" },
+        { "id": 3, "name": "T-Shirt", "color": "red" }
+    ]
+}

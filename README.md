@@ -67,6 +67,12 @@ gcloud functions deploy cud \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 
+gcloud functions deploy cypher \
+     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --timeout=300 \
+     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
+     --trigger-http
+
 gcloud functions deploy node \
      --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
      --timeout=300 \
@@ -90,6 +96,11 @@ LOCALDEPLOY=http://localhost:8080/
 
 # CUD
 curl --data @test/cud-messages.json \
+    -H "Content-Type: application/json" -X POST \
+    $LOCALDEPLOY
+
+# Cypher
+curl --data @test/cypher-payload.json \
     -H "Content-Type: application/json" -X POST \
     $LOCALDEPLOY
 
@@ -207,6 +218,7 @@ yarn test
 
 ```
 ./node_modules/.bin/functions-framework --target=cud
+./node_modules/.bin/functions-framework --target=cypher
 ./node_modules/.bin/functions-framework --target=node
 ./node_modules/.bin/functions-framework --target=edge
 ```
