@@ -1,0 +1,49 @@
+[
+    {
+        "op": "create",
+        "type": "node",
+        "labels": ["Person"],
+        "properties": {
+            "uuid": "A",
+            "name": "Mark Bosc",
+            "phone": "123-456-7899"
+        }
+    },
+    {
+        "op": "merge",
+        "type": "node",
+        "labels": ["Person"],
+        "ids": { "uuid": "A" },
+        "properties": {
+            "dob": "2020-01-01",
+            "age": 1
+        }
+    },
+    {
+        "op": "merge",
+        "type": "node",
+        "labels": ["Person"],
+        "ids": { "uuid": "B" },
+        "properties": {
+            "uuid": "B",
+            "name": "Mary Test",
+            "phone": "123-456-7899"
+        }
+    },
+    {
+        "op": "merge",
+        "type": "relationship",
+        "rel_type": "KNOWS",
+        "from": {
+            "labels": ["Person"],
+            "ids": { "uuid": "A" }
+        },
+        "to": {
+            "labels": ["Person"],
+            "ids": { "uuid": "B" }
+        },
+        "properties": {
+            "since": "2020-01-01"
+        }
+    }
+]

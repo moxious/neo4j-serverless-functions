@@ -76,7 +76,12 @@ gcloud beta functions deploy edge \
 
 ```
 # Given this local deploy URL prefix (provided by local testing above)
-LOCALDEPLOY=http://localhost:8010/my-project/my-zone
+LOCALDEPLOY=http://localhost:8080/
+
+# CUD
+curl --data @test/cud-messages.json \
+    -H "Content-Type: application/json" -X POST \
+    $LOCALDEPLOY
 
 # Node
 curl -H "Content-Type: application/json" -X POST \

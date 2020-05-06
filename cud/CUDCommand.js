@@ -56,8 +56,8 @@ const matchOn = (alias, criteria, paramField='ids') => {
  * @param {String} alias name of variable to alias
  * @param {Object} data key/value pairs of properties to match on.
  */
-const nodePattern = (alias, data) =>
-    `(${alias}:${labels2Cypher(data.labels)} ${matchProperties(data.ids)})`;
+const nodePattern = (alias, data, paramFields='ids') =>
+    `(${alias}:${labels2Cypher(data.labels)} ${matchProperties(data.ids || {}, paramFields)})`;
 
 class CUDCommand {
     constructor(data={}) {
@@ -78,10 +78,14 @@ class CUDCommand {
     _generateNode() {
         const { op, properties, ids, labels } = this.data;
 
+        let whereClause = '';
+
+        if (op === 'merge') {
+
+        }
+
         return (`
-            ${op.toUpperCase()} (n:${labels2Cypher(labels)})
-            WHERE 
-            ${matchOn('n', ids)}
+            ${op.toUpperCase()} ${nodePattern('n', this.data)}
             SET n += $event.properties
             RETURN $event.op as op, $event.type as type, id(n) as id
         `);
@@ -97,7 +101,7 @@ class CUDCommand {
         }
 
         return (`
-            MATCH ${nodePattern('a', from)}-[r:${escape(rel_type)}]->${nodePattern('b', to)}
+            MATCH ${nodePattern('a', from, 'from.ids')}-[r:${escape(rel_type)}]->${nodePattern('b', to, 'to.ids')}
             ${extraMatch}
             DELETE r
             RETURN $event.op as op, $event.type as type, id(r) as id
@@ -107,9 +111,9 @@ class CUDCommand {
     _generateRelationship() {
         const { op, from, rel_type, to, properties, ids, labels } = this.data;
         return (`
-            MATCH ${nodePattern('a', from)} 
+            MATCH ${nodePattern('a', from, 'from.ids')} 
             WITH a 
-            MATCH ${nodePattern('b', to)}
+            MATCH ${nodePattern('b', to, 'to.ids')}
             ${op.toUpperCase()} (a)-[r:${escape(rel_type)}]->(b)
             SET r += $event.properties
             RETURN $event.op as op, $event.type as type, id(r) as id
@@ -137,11 +141,18 @@ class CUDCommand {
      */
     run(tx) {
         const cypher = this.generate();
-        const params = {};
+        const params = { event: this.data };
 
+        console.log('RUNNING ', cypher);
         return tx.run(cypher, params)
             .then(results => {
                 const rec = results.records[0];
+
+                if (!rec) { 
+                    console.error('Cypher produced no results', cypher, JSON.stringify(params));
+                    return null; 
+                }
+
                 const id = rec.get('id');
 
                 return {

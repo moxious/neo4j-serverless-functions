@@ -2,7 +2,24 @@ const CUDCommand = require('./CUDCommand');
 
 const cleanupString = str => str.trim().replace(/\s+/g, ' ');
 
-describe('CUD Command', function() { 
+describe('CUD Command', function() {
+    it('should create a node', () => {
+        const data = {
+            op: 'create',
+            type: 'node',
+            labels: ['Person'],
+            properties: {
+                a: 'b',
+            },
+        };
+
+        const expected = "CREATE (n:`Person` { }) SET n += $event.properties RETURN $event.op as op, $event.type as type, id(n) as id";
+
+        const c = new CUDCommand(data);
+        expect(cleanupString(c.generate())).toEqual(expected);
+    });
+
+
     it('should merge a node', () => {
         const data = {
             op: 'merge',
@@ -17,7 +34,7 @@ describe('CUD Command', function() {
             },
         };
 
-        const expected = "MERGE (n:`Person`) WHERE `n`.`foo` = $event.ids.`foo` AND `n`.`baz` = $event.ids.`baz` SET n += $event.properties RETURN $event.op as op, $event.type as type, id(n) as id";
+        const expected = "MERGE (n:`Person` { `foo`: $event.ids.`foo`, `baz`: $event.ids.`baz` }) SET n += $event.properties RETURN $event.op as op, $event.type as type, id(n) as id";
 
         const c = new CUDCommand(data);
         expect(cleanupString(c.generate())).toEqual(expected);
@@ -68,7 +85,7 @@ describe('CUD Command', function() {
             rel_type: 'WORKS_FOR',
         };
 
-        const expected = "MATCH (a:`Person` { `x`: $event.ids.`x`, `y`: $event.ids.`y` }) WITH a MATCH (b:`Company` { `z`: $event.ids.`z` }) CREATE (a)-[r:`WORKS_FOR`]->(b) SET r += $event.properties RETURN $event.op as op, $event.type as type, id(r) as id";
+        const expected = "MATCH (a:`Person` { `x`: $event.from.ids.`x`, `y`: $event.from.ids.`y` }) WITH a MATCH (b:`Company` { `z`: $event.to.ids.`z` }) CREATE (a)-[r:`WORKS_FOR`]->(b) SET r += $event.properties RETURN $event.op as op, $event.type as type, id(r) as id";
         const c = new CUDCommand(data);
         expect(cleanupString(c.generate())).toEqual(expected);
     });
@@ -88,7 +105,7 @@ describe('CUD Command', function() {
             rel_type: 'blorko',
         };
 
-        const expected = "MATCH (a:`Foo` { `uuid`: $event.ids.`uuid` })-[r:`blorko`]->(b:`Bar` { `uuid`: $event.ids.`uuid` }) DELETE r RETURN $event.op as op, $event.type as type, id(r) as id";
+        const expected = "MATCH (a:`Foo` { `uuid`: $event.from.ids.`uuid` })-[r:`blorko`]->(b:`Bar` { `uuid`: $event.to.ids.`uuid` }) DELETE r RETURN $event.op as op, $event.type as type, id(r) as id";
         const c = new CUDCommand(data);
         expect(cleanupString(c.generate())).toEqual(expected);
     });

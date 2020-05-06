@@ -28,8 +28,10 @@ const cud = (req, res) => {
 
     const session = neo4j.getDriver().session();
 
+    // Use of mapSeries is important here to run promises *in order* since some CUD messages
+    // may depend on previous ones succeeding.
     return session.writeTransaction(tx =>
-        Promise.map(commands, cudCommand => cudCommand.run(tx), { concurrency: 1 })
+        Promise.mapSeries(commands, cudCommand => cudCommand.run(tx))
     )
         .then(results => res.status(200).json(results))
         .catch(err => {
