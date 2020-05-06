@@ -46,6 +46,23 @@ Connection details to your Neo4j instance are taken out of three env vars:
 *Make sure to tweak the settings in this deploy*.  This deploys unsecured functions
 that unauthenticated users can connect to.  Tailor the settings to your needs.
 
+### PubSub Triggered Functions
+
+```
+export NEO4J_USER=neo4j
+export NEO4J_PASSWORD=secret
+export NEO4J_URI=neo4j+s://my-host:7687/
+export TOPIC=messages
+
+gcloud functions deploy cudPubsub \
+     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --timeout=300 \
+     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
+     --trigger-topic $TOPIC
+```
+
+### HTTP Functions
+
 ```
 export NEO4J_USER=neo4j
 export NEO4J_PASSWORD=secret

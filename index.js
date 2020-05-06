@@ -1,6 +1,7 @@
 const nodeSvc = require('./services/http/node');
 const edgeSvc = require('./services/http/edge');
 const cudSvc = require('./services/http/cud');
+const cudPubsub = require('./services/pubsub/cudPubsub');
 const moment = require('moment');
 
 /**
@@ -9,7 +10,7 @@ const moment = require('moment');
  * @param {*} res response object
  * @returns an export function
  */
-const guaranteeResponse = (aFunction, failMsg = 'Error processing response') => {
+const guaranteeResponseHTTP = (aFunction, failMsg = 'Error processing response') => {
   return (req, res) => {
     try {
       return aFunction(req, res);
@@ -24,8 +25,19 @@ const guaranteeResponse = (aFunction, failMsg = 'Error processing response') => 
   };
 };
 
+const guaranteeCallbackPubsub = (aFunction) => {
+  return (pubSubEvent, context, callback) => {
+    try {
+      return aFunction(pubSubEvent, context, callback);
+    } catch(err) { 
+      callback(err);
+    }
+  };
+};
+
 module.exports = {
-  node: guaranteeResponse(nodeSvc),
-  edge: guaranteeResponse(edgeSvc),
-  cud: guaranteeResponse(cudSvc),
+  node: guaranteeResponseHTTP(nodeSvc),
+  edge: guaranteeResponseHTTP(edgeSvc),
+  cud: guaranteeResponseHTTP(cudSvc),
+  cudPubsub: guaranteeCallbackPubsub(cudPubsub),
 };
