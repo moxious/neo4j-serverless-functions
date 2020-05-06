@@ -3,6 +3,7 @@ const Promise = require('bluebird');
 const flat = require('flat');
 const _ = require('lodash');
 const me = require('../package.json');
+const Neode = require('neode');
 
 /**
  * Using environment variables, creates a new authenticated driver instance.
@@ -43,6 +44,17 @@ const createNeo4jPropertiesFromObject = obj => {
     });
 
     return flattened;
+};
+
+const buildRelQuery = obj => {
+    const n = new Neode('localhost', 'neo4j', 'admin');
+    return n.query()
+        .match('a', obj.from.label).where(`a.${obj.from.key}`, obj.from.value)
+        .match('b', obj.to.label).where(`b.${obj.to.key}`, obj.to.value)
+        .with(['a', 'b'])
+        .create()
+        
+
 };
 
 module.exports = {

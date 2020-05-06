@@ -18,9 +18,16 @@ using it with Trello and Slack, but others are possible too.
 yarn install
 ```
 
+## Unit Testing
+
+```
+yarn test
+```
+
 ## Local Testing
 
 ```
+./node_modules/.bin/functions-framework --target=cud
 ./node_modules/.bin/functions-framework --target=node
 ./node_modules/.bin/functions-framework --target=edge
 ```
@@ -138,7 +145,10 @@ This is equivalent to doing this in Cypher:
 
 Any POST'd JSON data will be stored as properties on the relationship.
 
-## Request Metadata
+## CUD Format
 
-HTTP headers associated with the requests will be stored in `:Request` nodes, which are linked
-to the nodes created by the functions, for traceability.
+The CUD format is a tiny JSON format that allows you to specify a graph "Create, Update, or Delete" (CUD)
+operation on a graph.  For example, a JSON message may indicate that you want to create a node with certain
+labels and properties.
+
+[See here for documentation on the CUD format](https://neo4j.com/docs/labs/neo4j-streams/current/#_cud_file_format)

@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
   "dependencies": {
     "@google-cloud/functions-framework": "^1.5.1",
     "bluebird": "^3.7.2",
@@ -10,6 +13,11 @@
     "lodash": "^4.17.15",
     "moment": "^2.25.3",
     "neo4j-driver": "^4.0.2",
-    "uuid": "^3.4.0"
+    "neode": "^0.4.3",
+    "uuid": "^8.0.0"
+  },
+  "devDependencies": {
+    "jest": "^26.0.1",
+    "sinon": "^9.0.2"
   }
 }
