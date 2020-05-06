@@ -1,4 +1,7 @@
 const _ = require('lodash');
+const neo4j = require('../neo4j');
+const Promise = require('bluebird');
+const Integer = require('neo4j-driver/lib/integer.js');
 
 const keyFor = cmd => {
     let { op, type, ids, properties, labels, from, to } = cmd.data;
@@ -75,6 +78,21 @@ class CUDBatch {
         return results;
     }
 
+    /**
+     * Batch a set of commands for optimal execution, and run each batch.
+     * @param {Array{CUDCommand}} commands 
+     * @returns {Promise} that resolves to an array of batch results.
+     */
+    static runAll(commands) {
+        const batches = CUDBatch.batchCommands(commands);
+
+        const session = neo4j.getDriver().session();
+
+        return session.writeTransaction(tx => 
+            Promise.mapSeries(batches, batch => batch.run(tx)))
+            .finally(session.close);
+    }
+
     run(tx) {
         if (this.batch.length === 0) {
             throw new Error('Empty Batches not allowed');
@@ -90,24 +108,16 @@ class CUDBatch {
             batch: this.batch.map(cmd => cmd.data),
         };
 
+        // console.log("BATCH",this.seq,cypher,params);
+
         // console.log('RUNNING ', cypher);
         return tx.run(cypher, params)
-            .then(results => {
-                const rec = results.records[0];
-
-                if (!rec) { 
-                    console.error('Cypher produced no results', cypher, JSON.stringify(params));
-                    return null; 
-                }
-
-                const id = rec.get('id');
-                // console.log('PAYLOAD',rec);
-                return {
-                    op: rec.get('op'),
-                    type: rec.get('type'),
-                    id: Integer.inSafeRange(id) ? Integer.toNumber(id) : Integer.toString(id),
-                };
-            });
+            .then(() => ({
+                batch: true,
+                key: this.getKey(),
+                sequence: this.seq,
+                commands: this.commands().length,
+            }));
     }   
 }
 

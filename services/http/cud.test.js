@@ -56,7 +56,9 @@ describe('CUD Function', () => {
                 expect(res.json.calledOnce).toBe(true);
                 expect(res.status.firstCall.args[0]).toEqual(200);
                 const results = res.json.firstCall.args[0];
-                expect(results).toEqual([data]);
+                const batch0 = results[0];
+                expect(batch0.batch).toBe(true);
+                expect(batch0.commands).toBe(1);
             });
     });
 

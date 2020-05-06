@@ -3,6 +3,7 @@ const moment = require('moment');
 const neo4j = require('../../neo4j');
 const Promise = require('bluebird');
 const CUDCommand = require('../../cud/CUDCommand');
+const CUDBatch = require('../../cud/CUDBatch');
 
 const cud = (req, res) => {
     const records = req.body;
@@ -26,24 +27,15 @@ const cud = (req, res) => {
         }));
     }
 
-    const session = neo4j.getDriver().session();
-
-    // Use of mapSeries is important here to run promises *in order* since some CUD messages
-    // may depend on previous ones succeeding.
-    return session.writeTransaction(tx =>
-        Promise.mapSeries(commands, cudCommand => cudCommand.run(tx))
-    )
-        .then(results => {
-            return res.status(200).json(results);
-        })
+    return CUDBatch.runAll(commands)
+        .then(results => res.status(200).json(results))
         .catch(err => {
             return res.status(500).json({
                 date: moment.utc().format(),
                 error: `${err}`,
                 stack: err.stack,
             });
-        })
-        .finally(session.close);
+        });
 };
 
 module.exports = cud;
