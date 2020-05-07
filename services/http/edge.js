@@ -23,17 +23,17 @@ const RESPOND_WITH_CONTENT = false;
 const edge = (req, res) => {
     const requiredParams = [
         'fromLabel', 'fromProp', 'fromVal',
-        'toLabel', 'toProp', 'toVal',
+        'toLabel', 'toProp', 'toVal', 'relType',
     ];
 
     for(let i=0; i<requiredParams.length; i++) {
         const v = req.query[requiredParams[i]];
         if (!v) {
-            return res.status(400).json({
+            return Promise.resolve(res.status(400).json({
                 date: moment.utc().format(),
                 error: 'One or more required parameters missing',
                 requiredParams,
-            });
+            }));
         }
     }
 

@@ -159,5 +159,15 @@ describe('CUD Command', function () {
                 to: { labels: ['X'], ids: { x: 1 } },
                 properties: { x: 1 },
             })).toThrow(Error));
+
+        it('requires from/to labels on relationships', () =>
+            expect(() => new CUDCommand({
+                type: 'relationship',
+                op: 'merge',
+                ids: { x: 1 },
+                from: { labels: [], ids: { x: 1 } },
+                to: { labels: [], ids: { x: 1 } },
+                properties: { x: 1 },
+            })).toThrow(Error));
     });
 });
