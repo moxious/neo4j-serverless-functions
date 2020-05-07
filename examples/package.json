@@ -1,0 +1,17 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-load-sync": "^1.0.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5",
+    "yargs": "^15.3.1"
+  }
+}
