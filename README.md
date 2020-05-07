@@ -2,11 +2,15 @@
 
 [![CircleCI](https://circleci.com/gh/moxious/neo4j-serverless-functions.svg?style=svg)](https://circleci.com/gh/moxious/neo4j-serverless-functions)
 
-Useful google cloud functions for working with neo4j.  Turn any neo4j
-database into a data sink that can be useful for callback hooks!
+Cloud functions for working with Neo4j.  Deploy these to Google Cloud, and you can pipe
+data into Neo4j from any system that can make an HTTP request, or can send a message to 
+a PubSub topic, like Cloud Dataflow, PubSub itself, and many others.
 
-Any online service that permits a callback webhook can use this code.  Right now I'm
-using it with Trello and Slack, but others are possible too.
+## Features
+
+* Endpoint for running batched Cypher operations
+* Endpoint for piping in data via the CUD format
+* PubSub and HTTP availability 
 
 ## Pre-Requisites
 
@@ -207,6 +211,16 @@ input would look like this:
 Your query will always be prepended with the clause `UNWIND batch AS event` so that
 the "event" variable reference will always be defined in your query to reference an individual
 row of data.
+
+## Security
+
+*It is very important you secure access to the functions in a way that is appropriate
+to your database*.  These functions fundamentally allow users to run cypher and modify
+data, so take care to use the existing Google Cloud Functions utilities to secure
+the endpoints.
+
+The development documentation in this repo assume an insecure "anyone can call this"
+endpoint.  I recommend using [Google Cloud identity or network-based access control](https://cloud.google.com/functions/docs/securing)
 
 ## Unit Testing
 
