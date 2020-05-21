@@ -1,5 +1,5 @@
 const CypherSink = require('./CypherSink');
-const neo4j = require('../neo4j');
+const neo4j = require('../driver');
 const sinon = require('sinon');
 
 describe('CypherSink', () => {
@@ -18,8 +18,7 @@ describe('CypherSink', () => {
 
         tx = { run };
 
-        session = sinon.stub();
-        session.returns({ writeTransaction: f => f(tx) });
+        session = sinon.stub().returns({ writeTransaction: f => f(tx) });
 
         driver = sinon.stub(neo4j, 'getDriver');
         driver.returns({ session });
@@ -47,7 +46,9 @@ describe('CypherSink', () => {
             ],
         };
 
-        return new CypherSink(data).run()
+        const fakeSession = { writeTransaction: f => f(tx) };
+
+        return new CypherSink(data).run(fakeSession)
             .then(result => {
                 expect(result.batch).toBe(true);
                 expect(result.elements).toBe(2);

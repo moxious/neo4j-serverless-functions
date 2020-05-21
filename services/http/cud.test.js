@@ -4,7 +4,7 @@ const cudPubsub = handlers.cudPubsub;
 
 const test = require('../../test');
 const cudMessages = require('../../test/cud-messages.json');
-const neo4j = require('../../neo4j');
+const integration = require('../../integration');
 const sinon = require("sinon");
 
 describe('CUD Function', () => {
@@ -25,12 +25,12 @@ describe('CUD Function', () => {
         session = sinon.stub();
         session.returns({ writeTransaction: f => f(tx) });
 
-        driver = sinon.stub(neo4j, 'getDriver');
+        driver = sinon.stub(integration.neo4j, 'getDriver');
         driver.returns({ session });
     });
 
     afterEach(() => {
-        neo4j.getDriver.restore();
+        integration.neo4j.getDriver.restore();
     });
 
     describe('Pubsub', () => {
@@ -114,7 +114,7 @@ describe('CUD Function', () => {
                     const results = res.json.firstCall.args[0];
                     const batch0 = results[0];
                     expect(batch0.batch).toBe(true);
-                    expect(batch0.commands).toBe(1);
+                    expect(batch0.elements).toBe(1);
                 });
         });
 

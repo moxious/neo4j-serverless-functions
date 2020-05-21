@@ -1,5 +1,5 @@
 const uuid = require('uuid');
-const test = require('../test/index');
+const test = require('../../test/index');
 
 const buf = [];
 for (let i=0; i<100; i++) {

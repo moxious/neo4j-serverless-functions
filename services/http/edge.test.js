@@ -1,6 +1,6 @@
 const edge = require('../../index').edge;
 const test = require('../../test');
-const neo4j = require('../../neo4j');
+const integration = require('../../integration');
 const sinon = require("sinon");
 const _ = require('lodash');
 
@@ -26,12 +26,12 @@ describe('Edge Function', () => {
             writeTransaction: f => f(tx) 
         });
 
-        driver = sinon.stub(neo4j, 'getDriver');
+        driver = sinon.stub(integration.neo4j, 'getDriver');
         driver.returns({ session });
     });
 
     afterEach(() => {
-        neo4j.getDriver.restore();
+        integration.neo4j.getDriver.restore();
     });
 
     const query = {

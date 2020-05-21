@@ -1,6 +1,6 @@
 const CUDBatch = require('./CUDBatch');
 const CUDCommand = require('./CUDCommand');
-const test = require('../test/');
+const test = require('../../test');
 
 const fakeCommands = () => {
     const messages = [];
