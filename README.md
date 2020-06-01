@@ -3,14 +3,14 @@
 [![CircleCI](https://circleci.com/gh/moxious/neo4j-serverless-functions.svg?style=svg)](https://circleci.com/gh/moxious/neo4j-serverless-functions)
 
 Cloud functions for working with Neo4j.  Deploy these to Google Cloud, and you can pipe
-data into Neo4j from any system that can make an HTTP request, or can send a message to 
+data into Neo4j from any system that can make an HTTP request, or can send a message to
 a PubSub topic, like Cloud Dataflow, PubSub itself, and many others.
 
 ## Features
 
 * Endpoint for running batched Cypher operations
 * Endpoint for piping in data via the CUD format
-* PubSub and HTTP availability 
+* PubSub and HTTP availability
 
 ## Pre-Requisites
 
@@ -145,7 +145,7 @@ If deeply nested JSON is posted to the endpoint, the dictionary will be flattene
 }
 ```
 
-Will turn into a property 
+Will turn into a property
 
 ```
 `model.name`: "something"
@@ -179,11 +179,11 @@ Any POST'd JSON data will be stored as properties on the relationship.
 
 The CUD function takes an array of CUD command objects.
 
-The CUD format is a tiny JSON format that allows you to specify a graph "Create, Update, 
-or Delete" (CUD) operation on a graph.  For example, a JSON message may indicate that you 
+The CUD format is a tiny JSON format that allows you to specify a graph "Create, Update,
+or Delete" (CUD) operation on a graph.  For example, a JSON message may indicate that you
 want to create a node with certain labels and properties.
 
-[See here for documentation on the CUD format](https://neo4j.com/docs/labs/neo4j-streams/current/#_cud_file_format)
+[See here for documentation on the CUD format](https://neo4j.com/docs/labs/neo4j-streams/current/consumer/#_cud_file_format)
 
 Example:
 
