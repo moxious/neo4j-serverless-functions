@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const moment = require('moment');
 const Promise = require('bluebird');
-const integration = require('../../integration');
+const gil = require('../../gil');
 
 const cud = (req, res) => {
     const records = req.body;
@@ -16,7 +16,7 @@ const cud = (req, res) => {
     let commands;
 
     try { 
-        commands = records.map(rec => new integration.CUDCommand(rec));
+        commands = records.map(rec => new gil.CUDCommand(rec));
     } catch(e) {
         // This is going to be a CUD message formatting error
         return Promise.resolve(res.status(400).json({
@@ -25,8 +25,8 @@ const cud = (req, res) => {
         }));
     }
 
-    const batches = integration.CUDBatch.batchCommands(commands);
-    const sink = new integration.DataSink(batches);
+    const batches = gil.CUDBatch.batchCommands(commands);
+    const sink = new gil.DataSink(batches);
 
     return sink.run()
         .then(results => res.status(200).json(results))

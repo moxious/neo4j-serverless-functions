@@ -1,12 +1,12 @@
 const moment = require('moment');
-const integration = require('../../integration');
+const gil = require('../../gil');
 
 const cypher = (req, res) => {
     const input = req.body;
 
-    const strategy = new integration.CypherSink(input);
+    const strategy = new gil.CypherSink(input);
 
-    return new integration.DataSink([strategy]).run()
+    return new gil.DataSink([strategy]).run()
         .then(results => res.status(200).json(results))
         .catch(err => res.status(500).json({
             date: moment.utc().format(),

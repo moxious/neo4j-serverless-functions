@@ -15,10 +15,8 @@ class CypherSink extends Strategy {
     constructor(data) {
         super();
 
-        if (!data.cypher) {
-            throw new Error('Input must contain a cypher field');
-        } else if (!data.batch || !_.isArray(data.batch) || _.isEmpty(data.batch)) {
-            throw new Error('Missing, invalid, or empty batch');
+        if (!data || !data.cypher || !data.batch || !_.isArray(data.batch) || _.isEmpty(data.batch)) {
+            throw new Error('Input must contain a valid cypher field and a valid batch');
         }
 
         this.data = data;

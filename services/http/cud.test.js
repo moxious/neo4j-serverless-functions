@@ -4,7 +4,7 @@ const cudPubsub = handlers.cudPubsub;
 
 const test = require('../../test');
 const cudMessages = require('../../test/cud-messages.json');
-const integration = require('../../integration');
+const gil = require('../../gil');
 const sinon = require("sinon");
 
 describe('CUD Function', () => {
@@ -25,12 +25,12 @@ describe('CUD Function', () => {
         session = sinon.stub();
         session.returns({ writeTransaction: f => f(tx) });
 
-        driver = sinon.stub(integration.neo4j, 'getDriver');
+        driver = sinon.stub(gil.neo4j, 'getDriver');
         driver.returns({ session });
     });
 
     afterEach(() => {
-        integration.neo4j.getDriver.restore();
+        gil.neo4j.getDriver.restore();
     });
 
     describe('Pubsub', () => {

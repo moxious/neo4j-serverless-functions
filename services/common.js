@@ -1,5 +1,5 @@
 const uuid = require('uuid');
-const neo4j = require('../integration/driver');
+const neo4j = require('../gil/driver');
 const _ = require('lodash');
 const moment = require('moment');
 

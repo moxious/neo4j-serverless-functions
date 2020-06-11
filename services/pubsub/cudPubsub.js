@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const moment = require('moment');
-const integration = require('../../integration');
+const gil = require('../../gil');
 
 // https://cloud.google.com/functions/docs/writing/background#function_parameters
 const cud = (pubSubEvent, context, callback) => {
@@ -13,7 +13,7 @@ const cud = (pubSubEvent, context, callback) => {
     let commands;
 
     try { 
-        commands = records.map(rec => new integration.CUDCommand(rec));
+        commands = records.map(rec => new gil.CUDCommand(rec));
     } catch(e) {
         // This is going to be a CUD message formatting error
         return Promise.resolve(callback(e, JSON.stringify({
@@ -22,8 +22,8 @@ const cud = (pubSubEvent, context, callback) => {
         })));
     }
 
-    const batches = integration.CUDBatch.batchCommands(commands);
-    const sink = new integration.DataSink(batches);
+    const batches = gil.CUDBatch.batchCommands(commands);
+    const sink = new gil.DataSink(batches);
 
     return sink.run()
         .then(results => callback(null, JSON.stringify(results)))
