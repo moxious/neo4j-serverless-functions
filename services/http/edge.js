@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const moment = require('moment');
-const neo4j = require('../../neo4j');
+const neo4j = require('../../gil/driver');
 const common = require('../common');
 
 const VERSION = 1;

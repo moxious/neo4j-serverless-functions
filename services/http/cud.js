@@ -1,9 +1,7 @@
 const _ = require('lodash');
 const moment = require('moment');
-const neo4j = require('../../neo4j');
 const Promise = require('bluebird');
-const CUDCommand = require('../../cud/CUDCommand');
-const CUDBatch = require('../../cud/CUDBatch');
+const gil = require('../../gil');
 
 const cud = (req, res) => {
     const records = req.body;
@@ -18,7 +16,7 @@ const cud = (req, res) => {
     let commands;
 
     try { 
-        commands = records.map(rec => new CUDCommand(rec));
+        commands = records.map(rec => new gil.CUDCommand(rec));
     } catch(e) {
         // This is going to be a CUD message formatting error
         return Promise.resolve(res.status(400).json({
@@ -27,7 +25,10 @@ const cud = (req, res) => {
         }));
     }
 
-    return CUDBatch.runAll(commands)
+    const batches = gil.CUDBatch.batchCommands(commands);
+    const sink = new gil.DataSink(batches);
+
+    return sink.run()
         .then(results => res.status(200).json(results))
         .catch(err => {
             return res.status(500).json({

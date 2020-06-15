@@ -1,11 +1,12 @@
 const moment = require('moment');
-const CypherSink = require('../../cud/CypherSink');
+const gil = require('../../gil');
 
 const cypher = (req, res) => {
     const input = req.body;
 
-    return new CypherSink(input)
-        .run()
+    const strategy = new gil.CypherSink(input);
+
+    return new gil.DataSink([strategy]).run()
         .then(results => res.status(200).json(results))
         .catch(err => res.status(500).json({
             date: moment.utc().format(),

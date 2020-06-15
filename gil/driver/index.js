@@ -2,7 +2,7 @@ const neo4j = require('neo4j-driver');
 const Promise = require('bluebird');
 const flat = require('flat');
 const _ = require('lodash');
-const me = require('../package.json');
+const me = require('../../package.json');
 const Neode = require('neode');
 
 const DRIVER_OPTIONS = {

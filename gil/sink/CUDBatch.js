@@ -1,7 +1,8 @@
 const _ = require('lodash');
-const neo4j = require('../neo4j');
+const neo4j = require('../driver');
 const Promise = require('bluebird');
 const Integer = require('neo4j-driver/lib/integer.js');
+const Strategy = require('./Strategy');
 
 const keyFor = cmd => {
     let { op, type, ids, properties, labels, from, to } = cmd.data;
@@ -13,14 +14,17 @@ let seq = 0;
 
 const MAX_BATCH_SIZE = 2000;
 
-class CUDBatch {
+class CUDBatch extends Strategy {
     constructor(sequence = seq++) {
+        super();
         this.batch = [];
         this.key = null;
         this.seq = sequence;
     }
 
     commands() { return this.batch; }
+    getEvents() { return this.commands(); }
+    getCypher() { return this.commands()[0].generate(); }
     isEmpty() { return this.batch.length === 0; }
     canHold(cmd) { return this.key === null || this.key === cmd.key(); }
 
@@ -92,33 +96,6 @@ class CUDBatch {
             Promise.mapSeries(batches, batch => batch.run(tx)))
             .finally(session.close);
     }
-
-    run(tx) {
-        if (this.batch.length === 0) {
-            throw new Error('Empty Batches not allowed');
-        }
-
-        const cypher = `
-            UNWIND $batch as event 
-            WITH event 
-            ${this.batch[0].generate()}
-        `;
-
-        const params = { 
-            batch: this.batch.map(cmd => cmd.data),
-        };
-
-        // console.log("BATCH",this.seq,cypher,params);
-
-        // console.log('RUNNING ', cypher);
-        return tx.run(cypher, params)
-            .then(() => ({
-                batch: true,
-                key: this.getKey(),
-                sequence: this.seq,
-                commands: this.commands().length,
-            }));
-    }   
 }
 
 module.exports = CUDBatch;
