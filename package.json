@@ -7,12 +7,12 @@
     "test": "jest --coverage --watchAll=false"
   },
   "dependencies": {
-    "@google-cloud/functions-framework": "^1.5.1",
+    "@google-cloud/functions-framework": "^1.7.1",
     "bluebird": "^3.7.2",
-    "flat": "^5.0.0",
+    "flat": "^5.0.1",
     "lodash": "^4.17.15",
     "moment": "^2.25.3",
-    "neo4j-driver": "^4.0.2",
+    "neo4j-driver": "^4.1.2",
     "neode": "^0.4.3",
     "uuid": "^8.0.0"
   },
