@@ -51,7 +51,13 @@ const createNeo4jPropertiesFromObject = obj => {
     return flattened;
 };
 
+const getSessionConfig = () => {
+    const database = process.env.NEO4J_DATABASE || false
+    return { ...(database ? { database } : {}) }
+}
+
 module.exports = {
     getDriver,
+    getSessionConfig,
     createNeo4jPropertiesFromObject,
 };
