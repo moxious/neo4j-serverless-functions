@@ -47,7 +47,7 @@ class CUDBatch extends Strategy {
 
     /**
      * Creates an array of batches for a sequence of commands.
-     * @param {Array{CUDCommand}} commands 
+     * @param {Array{CUDCommand}} commands
      * @returns {Array[CUDBatch]}
      */
     static batchCommands(commands, maxBatchSize=MAX_BATCH_SIZE) {
@@ -67,7 +67,7 @@ class CUDBatch extends Strategy {
             if (activeBatch.canHold(command)) {
                 // console.log('adding to batch ', batches);
                 return activeBatch.add(command);
-            } 
+            }
 
             // console.log('created batch ', ++batches);
             results.push(activeBatch);
@@ -84,15 +84,16 @@ class CUDBatch extends Strategy {
 
     /**
      * Batch a set of commands for optimal execution, and run each batch.
-     * @param {Array{CUDCommand}} commands 
+     * @param {Array{CUDCommand}} commands
      * @returns {Promise} that resolves to an array of batch results.
      */
     static runAll(commands) {
         const batches = CUDBatch.batchCommands(commands);
 
-        const session = neo4j.getDriver().session();
+        const session = neo4j.getDriver()
+	    .session(neo4j.getSessionConfig());
 
-        return session.writeTransaction(tx => 
+        return session.writeTransaction(tx =>
             Promise.mapSeries(batches, batch => batch.run(tx)))
             .finally(session.close);
     }
