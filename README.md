@@ -48,6 +48,12 @@ should be taken from.
 *Make sure to tweak the settings in this deploy*.  This deploys unsecured functions
 that unauthenticated users can connect to.  Tailor the settings to your needs.
 
+The `.github/workflows/build.yaml` file gives a GitHub Actions pipeline example of how
+to build and deploy this module.  The build requires a service key JSON secret `GOOGLE_APPLICATION_CREDENTIALS` and it requires a `GCP_PROJECT_ID` secret indicating the
+project to deploy to.
+
+Below commands are for manual deploys only, and are examples.
+
 ### PubSub Triggered Functions
 
 Make sure to customize the trigger topic and environment variables!
@@ -76,25 +82,25 @@ export NEO4J_PASSWORD=secret
 export NEO4J_URI=neo4j+s://my-host:7687/
 
 gcloud functions deploy cud \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 
 gcloud functions deploy cypher \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 
 gcloud functions deploy node \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 
 gcloud functions deploy edge \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
@@ -222,7 +228,8 @@ Your query will always be prepended with the clause `UNWIND batch AS event` so t
 the "event" variable reference will always be defined in your query to reference an individual
 row of data.
 
-Here's another example which would create a set of relationships
+Here's another example which would create a set of relationships; make a simple social network
+in one JSON post body.
 
 ```
 {
