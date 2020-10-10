@@ -4,22 +4,11 @@ const flat = require('flat');
 const _ = require('lodash');
 const me = require('../../package.json');
 const Neode = require('neode');
+const driverConfiguration = require('./driverConfiguration');
 
-const DRIVER_OPTIONS = {
-    maxConnectionLifetime: 8 * 1000 * 60, // 8 minutes
-    connectionLivenessCheckTimeout: 2 * 1000 * 60,
-};
-
-/**
- * Using environment variables, creates a new authenticated driver instance.
- */
-const driverSetup = () => {
-    const username = process.env.NEO4J_USER || 'neo4j';
-    const password = process.env.NEO4J_PASSWORD || 'neo4j';
-    const uri = process.env.NEO4J_URI || 'bolt://localhost';
-
-    const auth = neo4j.auth.basic(username, password);
-    const driver = neo4j.driver(uri, auth, DRIVER_OPTIONS);
+const driverSetup = async () => {
+    const config = await driverConfiguration();
+    const driver = neo4j.driver(...config);
 
     driver._userAgent = `neo4j-serverless-functions/v${me.version}`;
     return driver;
