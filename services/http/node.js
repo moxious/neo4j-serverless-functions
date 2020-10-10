@@ -4,7 +4,7 @@ const neo4j = require('../../gil/driver');
 const Integer = require('neo4j-driver/lib/integer.js');
 const common = require('../common');
 
-const node = (req, res) => {
+const node = async (req, res) => {
     // If user submitted a label, use that.
     const label = _.get(req.query, 'label') || _.get(req.params, 'label') || 'Entry';
 
@@ -24,7 +24,8 @@ const node = (req, res) => {
 
     // Batch parameter to set in query.
     const batch = records.map(propSet => ({ props: neo4j.createNeo4jPropertiesFromObject(propSet) }));
-    const session = neo4j.getDriver().session();
+    const driver = await neo4j.getDriver();
+    const session = driver.session();
 
     const cypher = `
         UNWIND $batch as input

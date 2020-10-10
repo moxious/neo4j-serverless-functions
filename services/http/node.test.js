@@ -25,8 +25,8 @@ describe('Node Function', () => {
             writeTransaction: f => f(tx) 
         });
 
-        driver = sinon.stub(gil.neo4j, 'getDriver');
-        driver.returns({ session });
+        const getDriverStub = sinon.stub(gil.neo4j, 'getDriver');
+        getDriverStub.returns(Promise.resolve({ session }));
     });
 
     afterEach(() => {

@@ -1,6 +1,6 @@
 # Neo4j Cloud Functions
 
-[![Actions Status](https://github.com/moxious/neo4j-serverless-functions/workflows/build/badge.svg)](https://github.com/moxious/neo4j-serverless-functions/actions)
+[![Actions Status](https://github.com/moxious/neo4j-serverless-functions/workflows/CI/badge.svg)](https://github.com/moxious/neo4j-serverless-functions/actions)
 
 Cloud functions for working with Neo4j.  Deploy these to Google Cloud, and you can pipe
 data into Neo4j from any system that can make an HTTP request, or can send a message to

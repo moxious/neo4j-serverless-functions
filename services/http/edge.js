@@ -20,7 +20,7 @@ const RESPOND_WITH_CONTENT = false;
  * @param {*} req 
  * @param {*} res 
  */
-const edge = (req, res) => {
+const edge = async (req, res) => {
     const requiredParams = [
         'fromLabel', 'fromProp', 'fromVal',
         'toLabel', 'toProp', 'toVal', 'relType',
@@ -65,7 +65,9 @@ const edge = (req, res) => {
         _.cloneDeep(req.query), 
         { relProps, requestProps }
     );
-    const session = neo4j.getDriver().session();
+
+    const driver = await neo4j.getDriver();
+    const session = driver.session();
 
     console.log('Running ', cypher, 'with', queryParams);
     return session.writeTransaction(tx => tx.run(cypher, queryParams))

@@ -6,8 +6,8 @@ class DataSink {
         this.strategies = strategies;
     }
 
-    run() {
-        const driver = neo4j.getDriver();
+    async run() {
+        const driver = await neo4j.getDriver();
         const session = driver.session(neo4j.getSessionConfig());
 
         return Promise.mapSeries(this.strategies, strategy => strategy.run(session))
