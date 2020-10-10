@@ -17,6 +17,8 @@ a PubSub topic, like Cloud Dataflow, PubSub itself, and many others.
 - Have a Google Cloud project
 - Have `gcloud` CLI installed
 - Enable the Cloud Functions API on that project.
+- Enable the Secrets Manager API
+- Create a service account with access to APIs above
 
 ## Setup
 
@@ -26,13 +28,17 @@ yarn install
 
 ## Configure
 
-On this branch you must use Google Secrets manager with the following keys, and ensure
+On this branch you may use Google Secrets manager with the following keys, and ensure
 that your service account has access to the following secrets.  Only the latest versions
-will be used
+will be used.
 
 - `NEO4J_USER`
 - `NEO4J_PASSWORD`
 - `NEO4J_URI`
+
+*If you do not enable secrets manager, the secrets will be taken from environment variables of the same name*
+
+The functions will not execute correctly if these details are not provided one way or the other.
 
 As an env var, you may set `GOOGLE_PROJECT` to point to the project where the secrets
 should be taken from.
@@ -215,6 +221,26 @@ input would look like this:
 Your query will always be prepended with the clause `UNWIND batch AS event` so that
 the "event" variable reference will always be defined in your query to reference an individual
 row of data.
+
+Here's another example which would create a set of relationships
+
+```
+{
+    "cypher": "MERGE (p1:Person{name: event.originator}) MERGE (p2:Person{name: event.accepter}) MERGE (p1)-[:FRIENDED { date: event.date }]->(p2)",
+    "batch": [
+       { "originator": "John", "accepter": "Sarah", "date": "2020-01-01" },
+       { "originator": "Anita", "accepter": "Joe", "date": "2020-01-02" },
+       { "originator": "Baz", "accepter": "John", "date": "2020-01-03" },
+       { "originator": "Evander", "accepter": "Sarah", "date": "2020-01-04" },
+       { "originator": "Idris", "accepter": "Evander", "date": "2020-01-05" },
+       { "originator": "Sarah", "accepter": "Baz", "date": "2020-01-06" },
+       { "originator": "Nia", "accepter": "Joe", "date": "2020-01-01" },
+       { "originator": "Joe", "accepter": "Baz", "date": "2020-01-03" },
+       { "originator": "Bob", "accepter": "Idris", "date": "2020-01-03" },
+       { "originator": "Joe", "accepter": "Evander", "date": "2020-01-03" }
+    ]
+}
+```
 
 ## Security
 
