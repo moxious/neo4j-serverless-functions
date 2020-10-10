@@ -16,12 +16,17 @@ const driverSetup = async () => {
 
 let persistentDriver = null;
 
+const setupInitial = async () => {
+    const driver = await driverSetup();
+    persistentDriver = driver;
+};
+
 /**
  * Get a driver instance.  Creates them lazy according to google best practices.
  */
 const getDriver = () => {
     if (!persistentDriver) {
-        persistentDriver = driverSetup();
+        throw new Error('Driver still in setup, or initialization failed');
     }
 
     return persistentDriver;
