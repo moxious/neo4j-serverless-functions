@@ -32,6 +32,7 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_key.json
 
   deploy:
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -42,3 +43,5 @@ jobs:
         service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         export_default_credentials: true
     - run: gcloud info
+    - run: gcloud functions deploy cudPubsub --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated --timeout=300 --set-env-vars GOOGLE_PROJECT=${{ secrets.GCP_PROJECT_ID }} --trigger-topic neo4j-cud
+    - run: gcloud functions deploy cypherPubsub --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated --timeout=300 --set-env-vars GOOGLE_PROJECT=${{ secrets.GCP_PROJECT_ID }} --trigger-topic cypher
