@@ -1,10 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches: [ gcp ]
-  pull_request:
-    branches: [ gcp ]
+on: [push, pull_request]
 
 jobs:
   build:
