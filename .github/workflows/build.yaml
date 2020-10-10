@@ -44,16 +44,16 @@ jobs:
         export_default_credentials: true
     - run: gcloud info
     - run: |
-        gcloud functions deploy cypherPubsub \
+        gcloud functions deploy cypherPubsubFromGithub \
           --ingress-settings=all --runtime=nodejs12 \
           --allow-unauthenticated --timeout=300 \
           --service-account=$(gcloud config list account --format "value(core.account)") \
           --set-env-vars GOOGLE_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
           --trigger-topic cypher
-    - run: |
-        gcloud functions deploy cudPubsub \
-          --ingress-settings=all --runtime=nodejs12 \
-          --allow-unauthenticated --timeout=300 \
-          --service-account=$(gcloud config list account --format "value(core.account)") \
-          --set-env-vars GOOGLE_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
-          --trigger-topic neo4j-cud
+    #- run: |
+    #    gcloud functions deploy cudPubsub \
+    #      --ingress-settings=all --runtime=nodejs12 \
+    #      --allow-unauthenticated --timeout=300 \
+    #      --service-account=$(gcloud config list account --format "value(core.account)") \
+    #      --set-env-vars GOOGLE_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
+    #      --trigger-topic neo4j-cud
