@@ -56,13 +56,13 @@ Make sure to customize the trigger topic and environment variables!
 # Ensure Google Secret Manager secrets are set
 
 gcloud functions deploy cudPubsub \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars GOOGLE_PROJECT=graphs-are-everywhere \
      --trigger-topic neo4j-cud
 
 gcloud functions deploy cypherPubsub \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars GOOGLE_PROJECT=graphs-are-everywhere \
      --trigger-topic cypher
