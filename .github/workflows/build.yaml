@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Node.js CI & Deploy
 
 on:
   push:
@@ -30,3 +30,15 @@ jobs:
       env:
         CI: true
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_key.json
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        version: '290.0.1'
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        export_default_credentials: true
+    - run: gcloud info
