@@ -64,17 +64,25 @@ Make sure to customize the trigger topic and environment variables!
 gcloud functions deploy cudPubsub \
      --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
-     --set-env-vars GOOGLE_PROJECT=graphs-are-everywhere \
+     --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
+     --set-env-vars URI_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_URI/versions/latest \
+     --set-env-vars USER_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_USER/versions/latest \
+     --set-env-vars PASSWORD_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_PASSWORD/versions/latest \
      --trigger-topic neo4j-cud
 
 gcloud functions deploy cypherPubsub \
      --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
-     --set-env-vars GOOGLE_PROJECT=graphs-are-everywhere \
+     --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
+     --set-env-vars URI_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_URI/versions/latest \
+     --set-env-vars USER_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_USER/versions/latest \
+     --set-env-vars PASSWORD_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_PASSWORD/versions/latest \
      --trigger-topic cypher
 ```
 
 ### HTTP Functions
+
+(On deploy carefully note the secret env vars if you want to use GSM)
 
 ```
 export NEO4J_USER=neo4j
