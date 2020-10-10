@@ -20,7 +20,7 @@ const setupInitial = async () => {
     const driver = await driverSetup();
     persistentDriver = driver;
 };
-
+ 
 /**
  * Get a driver instance.  Creates them lazy according to google best practices.
  */
