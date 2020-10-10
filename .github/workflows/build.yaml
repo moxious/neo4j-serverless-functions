@@ -44,7 +44,7 @@ jobs:
         export_default_credentials: true
     - run: gcloud info
     - run: |
-        gcloud functions deploy cypherPubsubFromGithub \
+        gcloud functions deploy cypherPubsub \
           --ingress-settings=all --runtime=nodejs12 \
           --allow-unauthenticated --timeout=300 \
           --service-account=$(gcloud config list account --format "value(core.account)") \
