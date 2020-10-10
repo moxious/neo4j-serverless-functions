@@ -26,10 +26,16 @@ yarn install
 
 ## Configure
 
-Connection details to your Neo4j instance are taken out of three env vars:
+On this branch you must use Google Secrets manager with the following keys, and ensure
+that your service account has access to the following secrets.  Only the latest versions
+will be used
+
 - `NEO4J_USER`
 - `NEO4J_PASSWORD`
 - `NEO4J_URI`
+
+As an env var, you may set `GOOGLE_PROJECT` to point to the project where the secrets
+should be taken from.
 
 ## Deploy
 
@@ -41,20 +47,18 @@ that unauthenticated users can connect to.  Tailor the settings to your needs.
 Make sure to customize the trigger topic and environment variables!
 
 ```
-export NEO4J_USER=neo4j
-export NEO4J_PASSWORD=secret
-export NEO4J_URI=neo4j+s://my-host:7687/
+# Ensure Google Secret Manager secrets are set
 
 gcloud functions deploy cudPubsub \
      --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
      --timeout=300 \
-     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
+     --set-env-vars GOOGLE_PROJECT=graphs-are-everywhere \
      --trigger-topic neo4j-cud
 
 gcloud functions deploy cypherPubsub \
      --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
      --timeout=300 \
-     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
+     --set-env-vars GOOGLE_PROJECT=graphs-are-everywhere \
      --trigger-topic cypher
 ```
 
