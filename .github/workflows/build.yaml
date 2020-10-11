@@ -40,6 +40,7 @@ jobs:
         export_default_credentials: true
     - run: gcloud info
     - run: |
+        # Deploy cypher pubsub
         gcloud functions deploy cypherPubsub \
           --ingress-settings=all --runtime=nodejs12 \
           --allow-unauthenticated --timeout=300 \
@@ -50,7 +51,7 @@ jobs:
           --set-env-vars PASSWORD_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_PASSWORD/versions/latest \
           --trigger-topic cypher
     - run: |
-        # Make env vars hashFiles
+        # Deploy custom cypher pubsub for image annotations
         echo "GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}" >> /tmp/env.yaml
         echo "URI_SECRET: projects/graphs-are-everywhere/secrets/NEO4J_URI/versions/latest" >> /tmp/env.yaml
         echo "USER_SECRET: projects/graphs-are-everywhere/secrets/NEO4J_USER/versions/latest" >> /tmp/env.yaml
