@@ -267,7 +267,30 @@ custom cypher function is for.
 The input format accepted is then only a batch array.  Because the Cypher sink query is "baked into the function",
 the function you deploy can only ever run that query.
 
-An equivalent way of doing the example above would be to deploy the customCypher
+Here's a deployment example of how you can use hard-wired custom cypher functions:
+
+```
+echo "GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}" >> /tmp/env.yaml
+echo "URI_SECRET: projects/graphs-are-everywhere/secrets/NEO4J_URI/versions/latest" >> /tmp/env.yaml
+echo "USER_SECRET: projects/graphs-are-everywhere/secrets/NEO4J_USER/versions/latest" >> /tmp/env.yaml
+echo "PASSWORD_SECRET: projects/graphs-are-everywhere/secrets/NEO4J_PASSWORD/versions/latest" >> /tmp/env.yaml
+echo 'CYPHER: "MERGE (p:Person) SET p += event"' >> /tmp/env.yaml
+
+
+gcloud functions deploy myCustomFunction \
+    --entry-point customCypherPubsub \
+    --ingress-settings=all --runtime=nodejs12 \
+    --allow-unauthenticated --timeout=300 \
+    --service-account=(address of service account)) \
+    --env-vars-file /tmp/env.yaml \
+    --trigger-topic personFeed
+```
+
+What this does:
+
+* The topic `personFeed` is assumed to publish arrays of JSON only (just the batch data)
+* It takes the `customCypherPubsub` function, and wires it to a Cloud Function called `myCustomFunction`
+* This function will only ever be able to execute the cypher query `MERGE (p:Person) SET p += event`
 
 ## Security
 
