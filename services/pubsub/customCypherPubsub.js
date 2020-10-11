@@ -10,7 +10,7 @@ const cypher = (pubSubEvent, context, callback) => {
     }
 
     const input = JSON.parse(Buffer.from(pubSubEvent.data, 'base64').toString());
-    console.log('CustomCypher input', input);
+    console.log('CustomCypher CYPHER', process.env.CYPHER, 'input', input);
     const cypher = new gil.CypherSink({
         cypher: process.env.CYPHER,
         batch: input,

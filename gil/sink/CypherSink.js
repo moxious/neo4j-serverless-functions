@@ -17,7 +17,7 @@ class CypherSink extends Strategy {
 
         if (!data || !data.cypher || !data.batch || !_.isArray(data.batch) || _.isEmpty(data.batch)) {
             console.error(JSON.stringify(data));
-            throw new Error('Input must contain a valid cypher field and a valid batch');
+            throw new Error(`Input must contain a valid cypher field and a valid batch. cypher=${_.get(data,'cypher')} batch=${_.get(data, 'batch')}`);
         }
 
         this.data = data;
