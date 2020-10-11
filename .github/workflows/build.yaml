@@ -49,3 +49,16 @@ jobs:
           --set-env-vars USER_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_USER/versions/latest \
           --set-env-vars PASSWORD_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_PASSWORD/versions/latest \
           --trigger-topic cypher
+    - run: |
+      gcloud functions deploy imageAnnotationsToNeo4j \
+        --entry-point customCypherPubsub \
+        --ingress-settings=all --runtime=nodejs12 \
+        --allow-unauthenticated --timeout=300 \
+        --service-account=$(gcloud config list account --format "value(core.account)") \
+        --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
+        --set-env-vars URI_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_URI/versions/latest \
+        --set-env-vars USER_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_USER/versions/latest \
+        --set-env-vars PASSWORD_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_PASSWORD/versions/latest \
+        --set-env-vars CYPHER="MERGE (i:Image {uri:event.uri}) MERGE (l:Label { mid: event.mid, description: event.description }) MERGE (i)-[:LABELED {score:event.score, confidence:event.confidence, topicality:event.topicality}]->(l)"
+        --trigger-topic imageAnnotation
+      

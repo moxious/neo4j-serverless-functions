@@ -257,6 +257,18 @@ in one JSON post body.
 }
 ```
 
+## Custom Cypher Function
+
+In the Cypher function above, note that the message to the function requires sending a Cypher query.  Sometimes
+the publisher of the message or sender of the JSON payload won't know the Cypher queries.  In this case, we want
+to bake in the cypher query and ensure that the function in question can only ever use 1 query.  That's what the
+custom cypher function is for.  
+
+The input format accepted is then only a batch array.  Because the Cypher sink query is "baked into the function",
+the function you deploy can only ever run that query.
+
+An equivalent way of doing the example above would be to deploy the customCypher
+
 ## Security
 
 *It is very important you secure access to the functions in a way that is appropriate
