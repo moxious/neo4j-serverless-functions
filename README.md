@@ -1,6 +1,6 @@
 # Neo4j Cloud Functions
 
-[![CircleCI](https://circleci.com/gh/moxious/neo4j-serverless-functions.svg?style=svg)](https://circleci.com/gh/moxious/neo4j-serverless-functions)
+[![Actions Status](https://github.com/moxious/neo4j-serverless-functions/workflows/CI/badge.svg)](https://github.com/moxious/neo4j-serverless-functions/actions)
 
 Cloud functions for working with Neo4j.  Deploy these to Google Cloud, and you can pipe
 data into Neo4j from any system that can make an HTTP request, or can send a message to
@@ -17,6 +17,8 @@ a PubSub topic, like Cloud Dataflow, PubSub itself, and many others.
 - Have a Google Cloud project
 - Have `gcloud` CLI installed
 - Enable the Cloud Functions API on that project.
+- Enable the Secrets Manager API
+- Create a service account with access to APIs above
 
 ## Setup
 
@@ -26,39 +28,61 @@ yarn install
 
 ## Configure
 
-Connection details to your Neo4j instance are taken out of three env vars:
+On this branch you may use Google Secrets manager with the following keys, and ensure
+that your service account has access to the following secrets.  Only the latest versions
+will be used.
+
 - `NEO4J_USER`
 - `NEO4J_PASSWORD`
 - `NEO4J_URI`
+
+*If you do not enable secrets manager, the secrets will be taken from environment variables of the same name*
+
+The functions will not execute correctly if these details are not provided one way or the other.
+
+As an env var, you may set `GOOGLE_PROJECT` to point to the project where the secrets
+should be taken from.
 
 ## Deploy
 
 *Make sure to tweak the settings in this deploy*.  This deploys unsecured functions
 that unauthenticated users can connect to.  Tailor the settings to your needs.
 
+The `.github/workflows/build.yaml` file gives a GitHub Actions pipeline example of how
+to build and deploy this module.  The build requires a service key JSON secret `GOOGLE_APPLICATION_CREDENTIALS` and it requires a `GCP_PROJECT_ID` secret indicating the
+project to deploy to.
+
+Below commands are for manual deploys only, and are examples.
+
 ### PubSub Triggered Functions
 
 Make sure to customize the trigger topic and environment variables!
 
 ```
-export NEO4J_USER=neo4j
-export NEO4J_PASSWORD=secret
-export NEO4J_URI=neo4j+s://my-host:7687/
+# Ensure Google Secret Manager secrets are set
 
 gcloud functions deploy cudPubsub \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
-     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
+     --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
+     --set-env-vars URI_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_URI/versions/latest \
+     --set-env-vars USER_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_USER/versions/latest \
+     --set-env-vars PASSWORD_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_PASSWORD/versions/latest \
      --trigger-topic neo4j-cud
 
 gcloud functions deploy cypherPubsub \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
-     --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
+     --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
+     --set-env-vars URI_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_URI/versions/latest \
+     --set-env-vars USER_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_USER/versions/latest \
+     --set-env-vars PASSWORD_SECRET=projects/graphs-are-everywhere/secrets/NEO4J_PASSWORD/versions/latest \
      --trigger-topic cypher
 ```
 
 ### HTTP Functions
+
+(On deploy carefully note the secret env vars if you want to use GSM)
 
 ```
 export NEO4J_USER=neo4j
@@ -66,25 +90,25 @@ export NEO4J_PASSWORD=secret
 export NEO4J_URI=neo4j+s://my-host:7687/
 
 gcloud functions deploy cud \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 
 gcloud functions deploy cypher \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 
 gcloud functions deploy node \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
 
 gcloud functions deploy edge \
-     --ingress-settings=all --runtime=nodejs10 --allow-unauthenticated \
+     --ingress-settings=all --runtime=nodejs12 --allow-unauthenticated \
      --timeout=300 \
      --set-env-vars NEO4J_USER=$NEO4J_USER,NEO4J_PASSWORD=$NEO4J_PASSWORD,NEO4J_URI=$NEO4J_URI \
      --trigger-http
@@ -211,6 +235,62 @@ input would look like this:
 Your query will always be prepended with the clause `UNWIND batch AS event` so that
 the "event" variable reference will always be defined in your query to reference an individual
 row of data.
+
+Here's another example which would create a set of relationships; make a simple social network
+in one JSON post body.
+
+```
+{
+    "cypher": "MERGE (p1:Person{name: event.originator}) MERGE (p2:Person{name: event.accepter}) MERGE (p1)-[:FRIENDED { date: event.date }]->(p2)",
+    "batch": [
+       { "originator": "John", "accepter": "Sarah", "date": "2020-01-01" },
+       { "originator": "Anita", "accepter": "Joe", "date": "2020-01-02" },
+       { "originator": "Baz", "accepter": "John", "date": "2020-01-03" },
+       { "originator": "Evander", "accepter": "Sarah", "date": "2020-01-04" },
+       { "originator": "Idris", "accepter": "Evander", "date": "2020-01-05" },
+       { "originator": "Sarah", "accepter": "Baz", "date": "2020-01-06" },
+       { "originator": "Nia", "accepter": "Joe", "date": "2020-01-01" },
+       { "originator": "Joe", "accepter": "Baz", "date": "2020-01-03" },
+       { "originator": "Bob", "accepter": "Idris", "date": "2020-01-03" },
+       { "originator": "Joe", "accepter": "Evander", "date": "2020-01-03" }
+    ]
+}
+```
+
+## Custom Cypher Function
+
+In the Cypher function above, note that the message to the function requires sending a Cypher query.  Sometimes
+the publisher of the message or sender of the JSON payload won't know the Cypher queries.  In this case, we want
+to bake in the cypher query and ensure that the function in question can only ever use 1 query.  That's what the
+custom cypher function is for.  
+
+The input format accepted is then only a batch array.  Because the Cypher sink query is "baked into the function",
+the function you deploy can only ever run that query.
+
+Here's a deployment example of how you can use hard-wired custom cypher functions:
+
+```
+echo "GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}" >> /tmp/env.yaml
+echo "URI_SECRET: projects/graphs-are-everywhere/secrets/NEO4J_URI/versions/latest" >> /tmp/env.yaml
+echo "USER_SECRET: projects/graphs-are-everywhere/secrets/NEO4J_USER/versions/latest" >> /tmp/env.yaml
+echo "PASSWORD_SECRET: projects/graphs-are-everywhere/secrets/NEO4J_PASSWORD/versions/latest" >> /tmp/env.yaml
+echo 'CYPHER: "MERGE (p:Person) SET p += event"' >> /tmp/env.yaml
+
+
+gcloud functions deploy myCustomFunction \
+    --entry-point customCypherPubsub \
+    --ingress-settings=all --runtime=nodejs12 \
+    --allow-unauthenticated --timeout=300 \
+    --service-account=(address of service account)) \
+    --env-vars-file /tmp/env.yaml \
+    --trigger-topic personFeed
+```
+
+What this does:
+
+* The topic `personFeed` is assumed to publish arrays of JSON only (just the batch data)
+* It takes the `customCypherPubsub` function, and wires it to a Cloud Function called `myCustomFunction`
+* This function will only ever be able to execute the cypher query `MERGE (p:Person) SET p += event`
 
 ## Security
 

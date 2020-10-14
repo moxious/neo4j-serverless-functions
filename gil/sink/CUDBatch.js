@@ -87,11 +87,11 @@ class CUDBatch extends Strategy {
      * @param {Array{CUDCommand}} commands
      * @returns {Promise} that resolves to an array of batch results.
      */
-    static runAll(commands) {
+    static async runAll(commands) {
         const batches = CUDBatch.batchCommands(commands);
 
-        const session = neo4j.getDriver()
-	    .session(neo4j.getSessionConfig());
+        const driver = await neo4j.getDriver();
+        const session = driver.session(neo4j.getSessionConfig());
 
         return session.writeTransaction(tx =>
             Promise.mapSeries(batches, batch => batch.run(tx)))
