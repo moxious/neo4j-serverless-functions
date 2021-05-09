@@ -11,7 +11,7 @@
     "@google-cloud/secret-manager": "^3.2.0",
     "bluebird": "^3.7.2",
     "flat": "^5.0.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "moment": "^2.25.3",
     "neo4j-driver": "^4.1.2",
     "neode": "^0.4.3",
