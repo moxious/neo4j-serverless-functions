@@ -282,7 +282,7 @@
     minimist "^1.2.0"
     on-finished "^2.3.0"
 
-"@google-cloud/secret-manager@^3.2.0":
+"@google-cloud/secret-manager@^3.6.1":
   version "3.6.1"
   resolved "https://neo.jfrog.io/neo/api/npm/npm/@google-cloud/secret-manager/-/secret-manager-3.6.1.tgz#5ba863aeabe52407b25754fb2e1a8ed006bebbcf"
   integrity sha1-W6hjrqvlJAeyV1T7LhqO0Aa+u88=
