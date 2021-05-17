@@ -5,7 +5,7 @@ const project = process.env.GCP_PROJECT || 'graphs-are-everywhere';
 
 // For proper auth, set GOOGLE_APPLICATION_CREDENTIALS to the key
 // that contains project information & service account.
-const getDriverOptions = async () => {    
+const getDriverOptions = async (config=process.env) => {    
     const DRIVER_OPTIONS = {
         maxConnectionLifetime: 8 * 1000 * 60, // 8 minutes
         connectionLivenessCheckTimeout: 2 * 1000 * 60,
@@ -13,26 +13,24 @@ const getDriverOptions = async () => {
 
     let uri, user, password;
 
-    try {
-        if (!process.env.URI_SECRET || !process.env.USER_SECRET || !process.env.PASSWORD_SECRET) {
-            throw new Error('In order to use GSM, you must specify env vars URI_SECRET, USER_SECRET, PASSWORD_SECRET');
-        }
-
+    if (config.URI_SECRET && config.USER_SECRET && config.PASSWORD_SECRET) {
         const client = new SecretManagerServiceClient();
-        const [uriResponse] = await client.accessSecretVersion({ name: process.env.URI_SECRET });
-        const [userResponse] = await client.accessSecretVersion({ name: process.env.USER_SECRET });
-        const [passwordResponse] = await client.accessSecretVersion({ name: process.env.PASSWORD_SECRET });
+        const val = await client.accessSecretVersion({ name: config.URI_SECRET });
+        console.log('SECRET ',val);
+
+        const [uriResponse] = await client.accessSecretVersion({ name: config.URI_SECRET });
+        const [userResponse] = await client.accessSecretVersion({ name: config.USER_SECRET });
+        const [passwordResponse] = await client.accessSecretVersion({ name: config.PASSWORD_SECRET });
 
         uri = uriResponse.payload.data.toString('utf8');
         user = userResponse.payload.data.toString('utf8');
         password = passwordResponse.payload.data.toString('utf8');
-    } catch (err) {
-        console.error('Failed to use Google Secrets Manager to configure the environment, due to:');
-        console.error(err);
+    } else {
+        console.error('Attempting to configure driver from the environment, as Google Secret Manager keys are not present');
 
-        uri = process.env.NEO4J_URI;
-        user = process.env.NEO4J_USER;
-        password = process.env.NEO4J_PASSWORD;
+        uri = config.NEO4J_URI;
+        user = config.NEO4J_USER;
+        password = config.NEO4J_PASSWORD;
     }
 
     if (!uri || !user || !password) {
