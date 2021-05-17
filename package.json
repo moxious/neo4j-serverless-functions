@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^1.7.1",
-    "@google-cloud/secret-manager": "^3.2.0",
+    "@google-cloud/secret-manager": "^3.6.1",
     "bluebird": "^3.7.2",
     "flat": "^5.0.1",
     "lodash": "^4.17.20",
@@ -19,6 +19,6 @@
   },
   "devDependencies": {
     "jest": "^26.0.1",
-    "sinon": "^9.0.2"
+    "sinon": "^9.2.4"
   }
 }
