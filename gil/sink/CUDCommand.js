@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const operations = ['create', 'merge', 'delete'];
 const types = ['node', 'relationship'];
-const Integer = require('neo4j-driver/lib/integer.js');
+const Integer = require('neo4j-driver-core/lib/integer.js');
 
 const validNonEmptyObject = o => {
     return _.isObject(o) && _.values(o).length > 0;
