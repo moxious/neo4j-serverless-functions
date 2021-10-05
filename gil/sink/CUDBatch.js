@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const neo4j = require('../driver');
 const Promise = require('bluebird');
-const Integer = require('neo4j-driver/lib/integer.js');
+const Integer = require('neo4j-driver-core/lib/integer.js');
 const Strategy = require('./Strategy');
 
 const keyFor = cmd => {
